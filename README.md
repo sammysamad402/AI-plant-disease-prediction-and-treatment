@@ -1,4 +1,4 @@
-# 🌿 PlantDoc AI — Robust Defense System Against Adversarial Attacks
+# 🌿 PlantDoc AI — Robust Defense System Against Adversarial Attacks using deep learning
 
 <div align="center">
 
