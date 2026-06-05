@@ -27,7 +27,7 @@ PlantDoc AI is a full-stack agricultural intelligence platform that detects plan
 
 > **Our Solution:** A 5-layer defense pipeline implementing FGSM, PGD, and C&W attack simulation with Gaussian blur and median filter defenses — recovering up to 79% accuracy under attack.
 
-Built as a **Major Project** for Computer Engineering, guided by **Prof. Farzana Khan**.
+Built as a **Major Project** for I.T, made by Abdul Samad Shaikh
 
 ---
 
