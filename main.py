@@ -138,8 +138,8 @@ DISEASE_INFO = {
         'organic_solutions': ['Vector control with beneficial insects', 'Reflective mulches', 'Crop rotation']
     }
 }
-
-MODEL_PATH = os.environ.get("MODEL_PATH", "model_weights.npy")
+#new
+MODEL_PATH = os.environ.get("MODEL_PATH", "model_weights.weights.h5")
 model = None
 try:
     weights = np.load(MODEL_PATH, allow_pickle=True)
