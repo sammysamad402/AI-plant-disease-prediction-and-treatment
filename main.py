@@ -155,6 +155,7 @@ try:
         keras.layers.Dropout(0.5),
         keras.layers.Dense(5,activation='softmax')
     ])
+    model(np.zeros((1, 224, 224, 3), dtype=np.float32))
     model.load_weights(MODEL_PATH)
     logger.info("Model loaded successfully")
 except Exception as e:
