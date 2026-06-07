@@ -134,20 +134,22 @@ MODEL_PATH = os.environ.get("MODEL_PATH", "BPLD_CNN_model.h5")
 model = None
 try:
     if os.path.exists(MODEL_PATH):
-        model = keras.models.load_model(
-            MODEL_PATH,
-            compile=False,
-            options=tf.saved_model.LoadOptions(
-                experimental_io_device='/job:localhost'
-            )
-        )
-        if model is None:
-            raise ValueError("Model is None after loading")
+        import h5py
+        with h5py.File(MODEL_PATH, 'r+') as f:
+            model_config = f.attrs.get('model_config')
+            if model_config:
+                import json
+                config = json.loads(model_config)
+                config_str = json.dumps(config).replace(
+                    '"batch_shape"', '"batch_input_shape"'
+                )
+                f.attrs['model_config'] = config_str.encode()
+        model = keras.models.load_model(MODEL_PATH, compile=False)
+        logger.info("Model loaded successfully")
     else:
         logger.error(f"Model file not found: {MODEL_PATH}")
 except Exception as e:
     logger.error(f'Model load error: {e}')
-
 
 def fgsm_attack(model, image, epsilon=0.03):
     image = tf.cast(tf.convert_to_tensor(image), tf.float32)
