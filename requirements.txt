@@ -3,7 +3,7 @@ uvicorn[standard]
 pymongo
 python-multipart
 opencv-python-headless
-tensorflow-cpu
+tensorflow-cpu==2.13.0
 pillow
 requests
 httpx
