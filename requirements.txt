@@ -1,12 +1,14 @@
-fastapi
+fastapi==0.103.2
 uvicorn[standard]
 pymongo
 python-multipart
 opencv-python-headless
-tensorflow-cpu==2.12.0
+tensorflow-cpu==2.13.0
+keras==2.13.1
 pillow
 requests
 httpx
 python-dotenv
-numpy
+numpy==1.24.3
 gdown
+h5py

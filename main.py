@@ -134,8 +134,15 @@ MODEL_PATH = os.environ.get("MODEL_PATH", "BPLD_CNN_model.h5")
 model = None
 try:
     if os.path.exists(MODEL_PATH):
-        model = keras.models.load_model(MODEL_PATH)
-        logger.info(f"Model loaded: {MODEL_PATH}")
+        model = keras.models.load_model(
+            MODEL_PATH,
+            compile=False,
+            options=tf.saved_model.LoadOptions(
+                experimental_io_device='/job:localhost'
+            )
+        )
+        if model is None:
+            raise ValueError("Model is None after loading")
     else:
         logger.error(f"Model file not found: {MODEL_PATH}")
 except Exception as e:
