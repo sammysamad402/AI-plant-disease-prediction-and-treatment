@@ -25,7 +25,7 @@ import os
 import gdown
 
 # Auto-download model if not present
-MODEL_PATH = os.environ.get("MODEL_PATH", "BPLD_CNN_model_fixed.h5")
+MODEL_PATH = os.environ.get("MODEL_PATH", "BPLD_CNN_model_v2.h5")
 if not os.path.exists(MODEL_PATH):
     drive_id = os.environ.get("MODEL_DRIVE_ID", "")
     if drive_id:
