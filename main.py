@@ -33,8 +33,8 @@ def patched_from_config(cls, config):
     return original_from_config.__func__(cls, config)
 
 kl.InputLayer.from_config = patched_from_config
-# Auto-download model if not present #clean model
-MODEL_PATH = os.environ.get("MODEL_PATH", "BPLD_CNN_model_clean.h5")
+# Auto-download model if not present
+MODEL_PATH = os.environ.get("MODEL_PATH", "model_weights.weights.h5")
 if not os.path.exists(MODEL_PATH):
     drive_id = os.environ.get("MODEL_DRIVE_ID", "")
     if drive_id:
@@ -142,7 +142,6 @@ DISEASE_INFO = {
 MODEL_PATH = os.environ.get("MODEL_PATH", "model_weights.weights.h5")
 model = None
 try:
-    weights = np.load(MODEL_PATH, allow_pickle=True)
     model = keras.Sequential([
         keras.layers.Input(shape=(224,224,3)),
         keras.layers.Conv2D(32,(3,3),activation='relu'),
@@ -156,12 +155,7 @@ try:
         keras.layers.Dropout(0.5),
         keras.layers.Dense(5,activation='softmax')
     ])
-    for i, layer in enumerate(model.layers):
-        if len(weights[i]) > 0:
-            try:
-                layer.set_weights(weights[i])
-            except:
-                pass
+    model.load_weights(MODEL_PATH)
     logger.info("Model loaded successfully")
 except Exception as e:
     logger.error(f'Model load error: {e}')
