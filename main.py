@@ -24,8 +24,8 @@ from shared_ui import shared_head, build_nav, TOAST_SCRIPT
 import os
 import gdown
 
-# Auto-download model if not present
-MODEL_PATH = os.environ.get("MODEL_PATH", "BPLD_CNN_model_v3.h5")
+# Auto-download model if not present #clean model
+MODEL_PATH = os.environ.get("MODEL_PATH", "BPLD_CNN_model_clean.h5")
 if not os.path.exists(MODEL_PATH):
     drive_id = os.environ.get("MODEL_DRIVE_ID", "")
     if drive_id:
