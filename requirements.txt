@@ -1,0 +1,12 @@
+fastapi
+uvicorn[standard]
+pymongo
+python-multipart
+opencv-python-headless
+tensorflow-cpu
+pillow
+requests
+httpx
+python-dotenv
+numpy
+gdown
