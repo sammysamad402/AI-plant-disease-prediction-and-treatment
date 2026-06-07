@@ -39,7 +39,7 @@ if not os.path.exists(MODEL_PATH):
     drive_id = os.environ.get("MODEL_DRIVE_ID", "")
     if drive_id:
         print("📥 Downloading model...")
-        gdown.download(f"https://drive.google.com/uc?id={drive_id}", MODEL_PATH, quiet=False, fuzzy=True)
+        gdown.download(f"https://drive.google.com/uc?id={drive_id}", MODEL_PATH, quiet=False)
         print("✅ Model downloaded!")
 
 logging.basicConfig(level=logging.INFO)
