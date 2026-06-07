@@ -24,6 +24,15 @@ from shared_ui import shared_head, build_nav, TOAST_SCRIPT
 import os
 import gdown
 
+import keras.layers as kl
+original_from_config = kl.InputLayer.from_config
+
+@classmethod
+def patched_from_config(cls, config):
+    config.pop('optional', None)
+    return original_from_config.__func__(cls, config)
+
+kl.InputLayer.from_config = patched_from_config
 # Auto-download model if not present #clean model
 MODEL_PATH = os.environ.get("MODEL_PATH", "BPLD_CNN_model_clean.h5")
 if not os.path.exists(MODEL_PATH):
