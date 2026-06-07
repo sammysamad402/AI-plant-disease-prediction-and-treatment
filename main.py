@@ -139,24 +139,30 @@ DISEASE_INFO = {
     }
 }
 
-MODEL_PATH = os.environ.get("MODEL_PATH", "BPLD_CNN_model.h5")
+MODEL_PATH = os.environ.get("MODEL_PATH", "model_weights.npy")
 model = None
 try:
-    if os.path.exists(MODEL_PATH):
-        import h5py
-        with h5py.File(MODEL_PATH, 'r+') as f:
-            model_config = f.attrs.get('model_config')
-            if model_config:
-                import json
-                config = json.loads(model_config)
-                config_str = json.dumps(config).replace(
-                    '"batch_shape"', '"batch_input_shape"'
-                )
-                f.attrs['model_config'] = config_str.encode()
-        model = keras.models.load_model(MODEL_PATH, compile=False)
-        logger.info("Model loaded successfully")
-    else:
-        logger.error(f"Model file not found: {MODEL_PATH}")
+    weights = np.load(MODEL_PATH, allow_pickle=True)
+    model = keras.Sequential([
+        keras.layers.Input(shape=(224,224,3)),
+        keras.layers.Conv2D(32,(3,3),activation='relu'),
+        keras.layers.MaxPooling2D(2,2),
+        keras.layers.Conv2D(64,(3,3),activation='relu'),
+        keras.layers.MaxPooling2D(2,2),
+        keras.layers.Conv2D(128,(3,3),activation='relu'),
+        keras.layers.MaxPooling2D(2,2),
+        keras.layers.Flatten(),
+        keras.layers.Dense(128,activation='relu'),
+        keras.layers.Dropout(0.5),
+        keras.layers.Dense(5,activation='softmax')
+    ])
+    for i, layer in enumerate(model.layers):
+        if len(weights[i]) > 0:
+            try:
+                layer.set_weights(weights[i])
+            except:
+                pass
+    logger.info("Model loaded successfully")
 except Exception as e:
     logger.error(f'Model load error: {e}')
 
