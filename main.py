@@ -34,12 +34,12 @@ def patched_from_config(cls, config):
 
 kl.InputLayer.from_config = patched_from_config
 # Auto-download model if not present
-MODEL_PATH = os.environ.get("MODEL_PATH", "model_weights.weights.h5")
+MODEL_PATH = os.environ.get("MODEL_PATH", "plant_model.h5")
 if not os.path.exists(MODEL_PATH):
     drive_id = os.environ.get("MODEL_DRIVE_ID", "")
     if drive_id:
         print("📥 Downloading model...")
-        gdown.download(f"https://drive.google.com/uc?id={drive_id}", MODEL_PATH, quiet=False)
+        gdown.download(f"https://drive.google.com/uc?id={drive_id}", MODEL_PATH, quiet=False, fuzzy=True)
         print("✅ Model downloaded!")
 
 logging.basicConfig(level=logging.INFO)
@@ -139,24 +139,10 @@ DISEASE_INFO = {
     }
 }
 #new
-MODEL_PATH = os.environ.get("MODEL_PATH", "model_weights.weights.h5")
+MODEL_PATH = os.environ.get("MODEL_PATH", "plant_model.h5")
 model = None
 try:
-    model = keras.Sequential([
-        keras.layers.Input(shape=(224,224,3)),
-        keras.layers.Conv2D(32,(3,3),activation='relu'),
-        keras.layers.MaxPooling2D(2,2),
-        keras.layers.Conv2D(64,(3,3),activation='relu'),
-        keras.layers.MaxPooling2D(2,2),
-        keras.layers.Conv2D(128,(3,3),activation='relu'),
-        keras.layers.MaxPooling2D(2,2),
-        keras.layers.Flatten(),
-        keras.layers.Dense(128,activation='relu'),
-        keras.layers.Dropout(0.5),
-        keras.layers.Dense(5,activation='softmax')
-    ])
-    model(np.zeros((1, 224, 224, 3), dtype=np.float32))
-    model.load_weights(MODEL_PATH)
+    model = keras.models.load_model(MODEL_PATH, compile=False)
     logger.info("Model loaded successfully")
 except Exception as e:
     logger.error(f'Model load error: {e}')
