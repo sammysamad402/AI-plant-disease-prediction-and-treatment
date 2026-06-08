@@ -3,6 +3,8 @@
 .env.local
 .env.production
 .env.*
+*.h5
+*.pt
 
 # ── ML MODELS (too large for GitHub) ─────────────────────────────────────────
 *.h5
@@ -14,6 +16,9 @@
 *.onnx
 saved_model/
 training/
+model_weights.npy
+uploads/
+__pycache__/
 
 # ── UPLOADS & USER DATA ───────────────────────────────────────────────────────
 uploads/
