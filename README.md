@@ -1,64 +1,68 @@
-# 🌿 PlantDoc AI — Robust Defense System Against Adversarial Attacks
-
 <div align="center">
+
+# 🌿 PlantDoc AI
+
+### AI-Powered Plant Disease Detection with Adversarial Defense
 
 [![Python](https://img.shields.io/badge/Python-3.11-3776AB?style=flat-square&logo=python&logoColor=white)](https://python.org)
 [![FastAPI](https://img.shields.io/badge/FastAPI-0.103+-009688?style=flat-square&logo=fastapi&logoColor=white)](https://fastapi.tiangolo.com)
 [![TensorFlow](https://img.shields.io/badge/TensorFlow-2.13-FF6F00?style=flat-square&logo=tensorflow&logoColor=white)](https://tensorflow.org)
 [![MongoDB](https://img.shields.io/badge/MongoDB-Atlas-47A248?style=flat-square&logo=mongodb&logoColor=white)](https://mongodb.com)
-[![Render](https://img.shields.io/badge/Deployed-Render-46E3B7?style=flat-square&logo=render&logoColor=white)](https://plantdoc-ai-u883.onrender.com)
+[![Hugging Face](https://img.shields.io/badge/HuggingFace-Spaces-FFD21E?style=flat-square&logo=huggingface&logoColor=black)](https://huggingface.co/spaces)
+[![Docker](https://img.shields.io/badge/Docker-Containerized-2496ED?style=flat-square&logo=docker&logoColor=white)](https://docker.com)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg?style=flat-square)](LICENSE)
-[![OpenAI](https://img.shields.io/badge/OpenAI-GPT--4o--mini-412991?style=flat-square&logo=openai&logoColor=white)](https://openai.com)
 
-**AI-powered plant disease detection with adversarial attack defense, JWT authentication, multilingual expert chat, and full farm management — live on Render.**
+A full-stack agricultural intelligence platform that detects plant diseases from leaf images using a custom-trained CNN, with a 5-layer defense pipeline against adversarial attacks, JWT-based authentication, and a multilingual expert consultation system.
 
-🔗 **Live Demo:** [plantdoc-ai-u883.onrender.com](https://plantdoc-ai-u883.onrender.com)
-
-[Features](#-features) • [Architecture](#️-system-architecture) • [Auth](#-authentication) • [Installation](#️-installation) • [Deployment](#-deployment-on-render) • [Model](#-model--weights) • [Results](#-results--performance)
+**[🚀 Live Demo →](https://huggingface.co/spaces/sammysamad402/plantdoc-ai)**
 
 </div>
 
 ---
 
-## 📌 About The Project
+## Overview
 
-PlantDoc AI is a full-stack agricultural intelligence platform that detects plant diseases from leaf images using a custom-trained CNN, while actively defending against adversarial attacks — invisible pixel manipulations that fool standard AI models.
+PlantDoc AI addresses a critical gap in agricultural AI: most plant disease detection models perform well in controlled lab settings but are completely vulnerable to adversarial perturbations — pixel-level noise invisible to the human eye that can collapse model accuracy from 91% to as low as 11%.
 
-> **Problem:** Existing plant disease AI systems achieve high accuracy in lab settings but are completely undefended against adversarial noise. A perturbation invisible to the human eye can drop model accuracy from 91% to 11%.
+This project implements a complete defense pipeline alongside a production-grade web application with user authentication, farm management tools, and multilingual expert AI chat — designed for real-world use by Indian farmers.
 
-> **Our Solution:** A 5-layer defense pipeline implementing FGSM, PGD, and C&W attack simulation with Gaussian blur and median filter defenses — recovering up to 79% accuracy under attack. Combined with full JWT-based user authentication so every farmer's data stays private.
+**Key outcomes:**
+- 91.4% baseline accuracy on a 5-class plant disease dataset
+- Adversarial accuracy recovered to 79.2% under FGSM attack (vs. 28% undefended)
+- Secure multi-user platform with private per-user data isolation
+- Multilingual AI consultation in 9 Indian languages
 
 ---
 
-## ✨ Features
+## Features
 
 | Feature | Description |
 |---|---|
-| 🔐 **JWT Authentication** | Full register/login system — each user's detections, diary, and consultations are private |
-| 🔬 **Disease Detection** | CNN model with 91.4% accuracy across 5 disease classes |
-| 🛡️ **Adversarial Defense** | FGSM, PGD & C&W attack simulation + 5-layer defense pipeline |
-| 🌦️ **Weather Enhancement** | Auto-corrects foggy, dark, and low-contrast field images |
-| 📹 **Live Webcam** | Real-time detection every 5 seconds with auto-defense |
-| 💬 **AgriDoc AI Chat** | Multilingual expert AI in 9 Indian languages with voice I/O |
-| 📔 **Farm Diary** | Personal detection & consultation history with tags and filters |
+| 🔬 **Disease Detection** | CNN model classifying 5 plant disease categories with 91.4% accuracy |
+| 🛡️ **Adversarial Defense** | 5-layer pipeline defending against FGSM, PGD, and C&W attacks |
+| 🔐 **JWT Authentication** | Secure register/login system; every user's data is fully private |
+| 📹 **Live Webcam Detection** | Real-time inference every 5 seconds with auto-defense enabled |
+| 💬 **AgriDoc AI Chat** | GPT-4o-mini powered expert in 9 Indian languages with voice I/O |
+| 🌦️ **Weather Enhancement** | Auto-correction for foggy, dark, and low-contrast field images |
+| 📔 **Farm Diary** | Personal detection history and consultation log with tags and filters |
 | 🗓️ **Crop Calendar** | Month-by-month farming guide for 5 major Indian crops |
-| 🏪 **Agri Shops Map** | GPS-based map of nearby agricultural stores and KVK centers |
+| 🏪 **Agri Shops Map** | GPS-based locator for nearby agricultural stores and KVK centers |
 
 ---
 
-## 🦠 Detectable Diseases
+## Detectable Diseases
 
 | Disease | Severity | Description |
 |---|---|---|
-| 🍂 Anthracnose | 🔴 High | Dark fungal lesions on leaves and stems |
-| 🌿 Healthy | ✅ None | Vibrant green foliage, no disease signs |
-| 🍃 Leaf Crinkle | 🟡 Medium | Viral leaf distortion and puckering |
-| 🌫️ Powdery Mildew | 🟡 Medium | White powder coating on leaf surfaces |
-| 🟡 Yellow Mosaic | 🔴 High | Viral yellow mottling patterns |
+| Anthracnose | High | Dark fungal lesions on leaves and stems |
+| Healthy | None | Vibrant green foliage, no disease signs |
+| Leaf Crinkle | Medium | Viral leaf distortion and puckering |
+| Powdery Mildew | Medium | White powder coating on leaf surfaces |
+| Yellow Mosaic | High | Viral yellow mottling patterns |
 
 ---
 
-## 🏗️ System Architecture
+## System Architecture
 
 ```
 Input Image
@@ -75,7 +79,7 @@ Input Image
 └─────────────────────────────────────────────────┘
     │
     ▼
-BPLD CNN Model (224×224 input → 5-class Softmax)
+BPLD CNN Model (224×224 → 5-class Softmax)
     │
     ▼
 Disease Name + Confidence + Severity + Treatment
@@ -85,84 +89,65 @@ Disease Name + Confidence + Severity + Treatment
 
 ```
 Input (224×224×3)
-→ Conv2D(32, 3×3, ReLU) → MaxPool
-→ Conv2D(64, 3×3, ReLU) → MaxPool
+→ Conv2D(32, 3×3, ReLU)  → MaxPool
+→ Conv2D(64, 3×3, ReLU)  → MaxPool
 → Conv2D(128, 3×3, ReLU) → MaxPool
 → Flatten
 → Dense(128, ReLU) → Dropout(0.5)
 → Dense(5, Softmax)
 ```
 
-### Adversarial Attacks Tested
+### Adversarial Robustness
 
-| Attack | Method | Accuracy Without Defense | Accuracy With Defense |
-|---|---|---|---|
-| FGSM | Fast Gradient Sign (ε=0.03) | 28% | **79.2%** |
-| PGD | Projected Gradient Descent (5 iters) | 11% | **71.0%** |
-| C&W | Carlini & Wagner (L2 optimize) | 19% | **68.3%** |
-
----
-
-## 🔐 Authentication
-
-PlantDoc AI uses **JWT (JSON Web Token)** based authentication — every user's data is fully private and scoped to their account.
-
-### How it works
-
-- **Register** with name, email, and password — stored securely with bcrypt hashing
-- **Login** returns a JWT token (7-day expiry) stored in `localStorage`
-- Every API request sends the token in the `Authorization: Bearer <token>` header
-- All detections, diary entries, and consultations are tagged with `user_id`
-- Records page only returns data belonging to the logged-in user
-
-### Auth Endpoints
-
-```
-POST  /auth/register   # Create new account
-POST  /auth/login      # Login, returns JWT token
-GET   /login           # Login page
-GET   /register        # Register page
-```
-
-### Environment variable required
-
-```env
-JWT_SECRET_KEY=your-long-random-secret-key
-JWT_EXPIRE_MINUTES=10080   # 7 days (default)
-```
+| Attack | Method | Undefended | Defended | Recovery |
+|---|---|---|---|---|
+| FGSM | Fast Gradient Sign (ε=0.03) | 28% | **79.2%** | +51% |
+| PGD | Projected Gradient Descent (5 iters) | 11% | **71.0%** | +60% |
+| C&W | Carlini & Wagner (L2 optimize) | 19% | **68.3%** | +49% |
 
 ---
 
-## 🛠️ Tech Stack
+## Authentication & Security
+
+PlantDoc AI uses JWT (JSON Web Token) based authentication with the following security practices:
+
+- Passwords are hashed using **bcrypt** before storage — plaintext passwords are never stored
+- Login returns a signed JWT token with a 7-day expiry, stored client-side
+- Every API request authenticates via `Authorization: Bearer <token>` header
+- All detection records, diary entries, and consultations are scoped to the authenticated `user_id`
+- Secrets (JWT key, database URI, API keys) are managed exclusively through environment variables — never hardcoded
+
+---
+
+## Tech Stack
 
 **Backend**
-- [FastAPI](https://fastapi.tiangolo.com) — REST API framework
+- [FastAPI](https://fastapi.tiangolo.com) — REST API framework with async support
 - [TensorFlow / Keras 2.13](https://tensorflow.org) — CNN model inference
-- [OpenCV](https://opencv.org) — Image processing & adversarial detection
+- [OpenCV](https://opencv.org) — Image processing and adversarial detection
 - [Pillow (PIL)](https://pillow.readthedocs.io) — Weather enhancement filters
-- [MongoDB Atlas](https://mongodb.com) — Database for users, detections & diary
-- [python-jose](https://github.com/mpdavis/python-jose) — JWT token handling
-- [passlib + bcrypt](https://passlib.readthedocs.io) — Password hashing
-- [h5py](https://www.h5py.org) — Version-safe model weight storage
-- [gdown](https://github.com/wkentaro/gdown) — Google Drive model download
+- [MongoDB Atlas](https://mongodb.com) — Cloud database for users, detections, and diary
+- [python-jose](https://github.com/mpdavis/python-jose) — JWT token creation and verification
+- [passlib + bcrypt](https://passlib.readthedocs.io) — Secure password hashing
+- [h5py](https://www.h5py.org) — Cross-version-safe model weight storage
+- [gdown](https://github.com/wkentaro/gdown) — Automatic model download from Google Drive
 
 **Frontend**
-- HTML5, CSS3, JavaScript — Unified web UI served directly from FastAPI
-- Inter font — consistent typography across all pages
+- HTML5, CSS3, vanilla JavaScript — served directly from FastAPI static routes
 
 **AI Services**
 - [OpenAI GPT-4o-mini](https://openai.com) — AgriDoc multilingual expert chat
 - Web Speech API — voice input and text-to-speech output
 
-**DevOps**
-- [Render](https://render.com) — Cloud deployment
-- [Google Drive + gdown](https://github.com/wkentaro/gdown) — Model weight hosting & auto-download
+**Infrastructure**
+- [Hugging Face Spaces](https://huggingface.co/spaces) — Cloud deployment via Docker
+- [Docker](https://docker.com) — Containerized runtime environment
+- [Google Drive + gdown](https://github.com/wkentaro/gdown) — Model weight hosting and auto-download at startup
 - [Uvicorn](https://uvicorn.org) — ASGI production server
-- python-dotenv — environment variable management
 
 ---
 
-## 📁 Project Structure
+## Project Structure
 
 ```
 AI-plant-disease-prediction-and-treatment/
@@ -170,117 +155,118 @@ AI-plant-disease-prediction-and-treatment/
 ├── main.py              # FastAPI app — detection, records, all page routes
 ├── auth.py              # JWT authentication — register, login, token verification
 ├── consultation.py      # AgriDoc AI chat — multilingual expert consultation
-├── diary.py             # Farm diary + agri shops page
+├── diary.py             # Farm diary and agri shops page
 ├── crop_calendar.py     # Month-by-month crop farming guide
-├── visualization.py     # Data visualization & analytics
+├── visualization.py     # Data visualization and analytics
 ├── shared_ui.py         # Unified design system — CSS, navbar, auth helpers
-│
-├── training/            # Training notebooks (empty — local only)
+├── Dockerfile           # Container definition for Hugging Face Spaces
 │
 ├── requirements.txt     # Python dependencies
 ├── .python-version      # Python version pin (3.11)
 ├── .gitignore
-├── .env                 # Environment variables (not committed)
 └── README.md
 ```
 
-> ⚠️ The model file (`weights_raw.h5`) is **not included** in the repo due to size. It is auto-downloaded from Google Drive at startup. See the [Model & Weights](#-model--weights) section below.
+> **Note:** The trained model file (`weights_raw.h5`) is intentionally excluded from this repository due to its size. It is automatically downloaded from Google Drive at container startup using `gdown`. See [Model Weights](#model-weights) below.
 
 ---
 
-## ⚙️ Installation
+## Installation
 
 ### Prerequisites
-- Python 3.11
-- MongoDB (local or [Atlas](https://mongodb.com/atlas))
-- OpenAI API key (for AgriDoc chat)
 
-### 1. Clone the repository
+- Python 3.11
+- MongoDB (local instance or [MongoDB Atlas](https://mongodb.com/atlas))
+- OpenAI API key (for AgriDoc consultation)
+
+### Setup
 
 ```bash
+# 1. Clone the repository
 git clone https://github.com/sammysamad402/AI-plant-disease-prediction-and-treatment.git
 cd AI-plant-disease-prediction-and-treatment
-```
 
-### 2. Create virtual environment
-
-```bash
+# 2. Create and activate virtual environment
 python -m venv venv
+source venv/bin/activate        # macOS / Linux
+# venv\Scripts\activate         # Windows
 
-# Windows
-venv\Scripts\activate
-
-# macOS / Linux
-source venv/bin/activate
-```
-
-### 3. Install dependencies
-
-```bash
+# 3. Install dependencies
 pip install -r requirements.txt
-```
 
-### 4. Set up environment variables
+# 4. Configure environment variables (see section below)
+cp .env.example .env
+# Edit .env with your values
 
-Create a `.env` file in the root directory:
-
-```env
-MONGO_URI=mongodb://localhost:27017/
-MODEL_PATH=weights_raw.h5
-MODEL_DRIVE_ID=your_google_drive_file_id
-UPLOAD_DIR=uploads
-OPENAI_API_KEY=your_openai_api_key_here
-JWT_SECRET_KEY=your-long-random-secret-key-here
-JWT_EXPIRE_MINUTES=10080
-```
-
-### 5. Run the server
-
-```bash
+# 5. Run the development server
 uvicorn main:app --host 0.0.0.0 --port 8000 --reload
 ```
 
-Open your browser at **http://localhost:8000** — you'll be redirected to login/register first.
+Open your browser at **http://localhost:8000** — you will be redirected to register or log in.
 
 ---
 
-## 🚀 Usage
+## Environment Variables
 
-### Web Application
+Create a `.env` file in the project root with the following values:
 
-| Page | URL | Auth Required |
-|---|---|---|
-| Home | `/` | ✅ |
-| Detect | `/predict` | ✅ |
-| Live Cam | `/webcam` | ✅ |
-| Records | `/records-page` | ✅ (own records only) |
-| Consult | `/consultation` | ✅ |
-| Diary | `/diary` | ✅ |
-| Calendar | `/crop-calendar` | ✅ |
-| Agri Shops | `/agri-shops` | ✅ |
-| Login | `/login` | ❌ |
-| Register | `/register` | ❌ |
+```env
+# Database
+MONGO_URI=mongodb://localhost:27017/
 
-### API Endpoints
+# Model
+MODEL_PATH=weights_raw.h5
+MODEL_DRIVE_ID=your_google_drive_file_id
 
+# File storage
+UPLOAD_DIR=uploads
+
+# AI services
+OPENAI_API_KEY=your_openai_api_key
+
+# Authentication
+JWT_SECRET_KEY=your-long-random-secret-key
+JWT_EXPIRE_MINUTES=10080
 ```
-POST   /detect              # Upload image for disease detection
-GET    /records             # Fetch current user's detection history
-DELETE /records/{id}        # Delete own record
-GET    /image/{filename}    # Serve uploaded image
-POST   /ask-expert          # Send message to AgriDoc AI
-POST   /diary/save          # Save diary entry
-GET    /diary/entries       # Get current user's diary entries
-GET    /crop-calendar       # Crop calendar page
-POST   /auth/register       # Register new user
-POST   /auth/login          # Login and receive JWT token
-```
+
+| Variable | Description |
+|---|---|
+| `MONGO_URI` | MongoDB connection string (local or Atlas) |
+| `MODEL_DRIVE_ID` | Google Drive file ID of the model weights |
+| `OPENAI_API_KEY` | OpenAI API key for AgriDoc chat |
+| `JWT_SECRET_KEY` | A long, random secret string for signing tokens |
+| `JWT_EXPIRE_MINUTES` | Token expiry in minutes — default is `10080` (7 days) |
 
 ---
 
-## ☁️ Deployment on Render
+## Deployment on Hugging Face Spaces
 
-### Environment Variables (set in Render dashboard)
+PlantDoc AI is deployed on [Hugging Face Spaces](https://huggingface.co/spaces) using a Docker runtime.
+
+### Why Hugging Face Spaces?
+
+The application was initially prototyped on **Render's free tier**. During load testing, TensorFlow inference workloads consistently exceeded Render's free-tier memory limits (~512 MB), causing the container to restart mid-request. Hugging Face Spaces provides a Docker-based environment with sufficient memory headroom for TensorFlow model inference, making it the appropriate host for this application.
+
+### How the Docker deployment works
+
+On container startup, `main.py` checks for the model weights file. If it is not present (as is the case on a fresh container), it downloads automatically from Google Drive:
+
+```python
+if not os.path.exists(MODEL_PATH):
+    gdown.download(
+        f"https://drive.google.com/uc?id={MODEL_DRIVE_ID}",
+        MODEL_PATH,
+        quiet=False
+    )
+```
+
+This keeps large binary files out of the repository while ensuring the deployed container is always self-sufficient.
+
+### Deploying to Hugging Face Spaces
+
+1. Create a new Space on [huggingface.co/spaces](https://huggingface.co/spaces), selecting **Docker** as the SDK
+2. Push your repository to the Space (or link your GitHub repo)
+3. Set the following environment variables in the Space **Settings → Variables and Secrets**:
 
 | Variable | Value |
 |---|---|
@@ -289,77 +275,87 @@ POST   /auth/login          # Login and receive JWT token
 | `MODEL_PATH` | `weights_raw.h5` |
 | `OPENAI_API_KEY` | Your OpenAI API key |
 | `JWT_SECRET_KEY` | A long random secret string |
-| `JWT_EXPIRE_MINUTES` | `10080` (7 days) |
+| `JWT_EXPIRE_MINUTES` | `10080` |
 
-### How auto-download works
-
-On startup, `main.py` checks if `weights_raw.h5` exists. If not, it downloads from Google Drive:
-
-```python
-if not os.path.exists(MODEL_PATH):
-    gdown.download(f"https://drive.google.com/uc?id={drive_id}", MODEL_PATH, quiet=False)
-```
+4. The Space will build the Docker image and deploy automatically.
 
 ---
 
-## 🧠 Model & Weights
+## Model Weights
 
-### The Cross-Version Keras Problem
+The model was trained locally and exported as raw numpy arrays using `h5py` — bypassing Keras serialization entirely. This solves cross-version compatibility issues where models trained on newer Keras versions fail to load on the deployment environment's TensorFlow 2.13.
 
-The model was trained locally on a newer Keras version but Render runs TensorFlow 2.13 / Keras 2.13. Direct `.h5` loading fails with errors like `No module named 'numpy._core'`, `batch_shape unrecognized`, or `layer expected 2 variables, received 0`.
+**To update the model:**
 
-### The Solution — Raw h5py Weight Storage
-
-Weights are saved as raw numpy arrays using `h5py` directly — completely bypassing Keras serialization and version metadata.
-
-**Export script (run locally):**
+1. Train your new model and export weights:
 
 ```python
-import tensorflow as tf
-from tensorflow import keras
 import h5py
+from tensorflow import keras
 
-old = keras.models.load_model('BPLD_CNN_model.h5', compile=False)
+model = keras.models.load_model('your_new_model.h5', compile=False)
 
 with h5py.File('weights_raw.h5', 'w') as f:
-    for i, layer in enumerate(old.layers):
-        w = layer.get_weights()
-        if len(w) > 0:
-            grp = f.create_group(f'layer_{i}')
-            for j, arr in enumerate(w):
-                grp.create_dataset(f'w{j}', data=arr)
-
-print("Done — upload weights_raw.h5 to Google Drive")
-```
-
-**Loading in `main.py`:**
-
-```python
-model = keras.Sequential([...])
-model(np.zeros((1, 224, 224, 3), dtype=np.float32))  # force build
-
-with h5py.File(MODEL_PATH, 'r') as f:
     for i, layer in enumerate(model.layers):
-        key = f'layer_{i}'
-        if key in f:
-            w = [f[key][k][()] for k in sorted(f[key].keys())]
-            layer.set_weights(w)
+        weights = layer.get_weights()
+        if weights:
+            grp = f.create_group(f'layer_{i}')
+            for j, arr in enumerate(weights):
+                grp.create_dataset(f'w{j}', data=arr)
 ```
 
-### Swapping the Model
-
-1. Run the export script above with your new trained model
-2. Upload `weights_raw.h5` to Google Drive
-3. Update `MODEL_DRIVE_ID` in Render environment variables
-4. Redeploy — weights download automatically
-
-If your new model has a different architecture, also update the `keras.Sequential([...])` block in `main.py` and `CLASS_NAMES` if classes changed.
+2. Upload `weights_raw.h5` to Google Drive (replace the existing file or create a new one)
+3. Update `MODEL_DRIVE_ID` in your Space secrets
+4. Restart the Space — weights will re-download automatically
 
 ---
 
-## 📊 Results & Performance
+## API Endpoints
 
-### CNN Model Performance (Clean Data)
+### Authentication
+
+```
+POST  /auth/register   # Create new account
+POST  /auth/login      # Login — returns signed JWT token
+```
+
+### Detection
+
+```
+POST  /detect                # Upload image for disease detection
+GET   /records               # Fetch current user's detection history
+DELETE /records/{id}         # Delete a detection record (own records only)
+GET   /image/{filename}      # Serve uploaded image file
+```
+
+### Consultation & Diary
+
+```
+POST  /ask-expert            # Send message to AgriDoc AI
+POST  /diary/save            # Save a diary entry
+GET   /diary/entries         # Fetch current user's diary entries
+```
+
+### Pages (Auth required except login/register)
+
+```
+GET   /           → Home
+GET   /predict    → Upload & detect
+GET   /webcam     → Live webcam detection
+GET   /records-page → Detection history
+GET   /consultation → AgriDoc AI chat
+GET   /diary        → Farm diary
+GET   /crop-calendar → Crop calendar
+GET   /agri-shops    → Agricultural store locator
+GET   /login         → Login page (public)
+GET   /register      → Register page (public)
+```
+
+---
+
+## Results & Performance
+
+### Classification Report (Clean Data)
 
 | Class | Precision | Recall | F1-Score |
 |---|---|---|---|
@@ -370,26 +366,36 @@ If your new model has a different architecture, also update the `keras.Sequentia
 | Yellow Mosaic | 0.90 | 0.89 | 0.89 |
 | **Overall** | | | **91.4%** |
 
-### Defense Effectiveness
+### Defense Effectiveness Summary
 
 ```
-Clean accuracy:          91.4%
-Under FGSM (defended):   79.2%  (+51% vs undefended 28%)
-Under PGD  (defended):   71.0%  (+60% vs undefended 11%)
-Under C&W  (defended):   68.3%  (+49% vs undefended 19%)
+Clean accuracy:              91.4%
+Under FGSM attack (defended):  79.2%   (vs. 28% undefended)
+Under PGD  attack (defended):  71.0%   (vs. 11% undefended)
+Under C&W  attack (defended):  68.3%   (vs. 19% undefended)
 ```
 
 ---
 
-## 🌐 AgriDoc — Multilingual AI Chat
+## AgriDoc — Multilingual AI Consultation
 
-Supported languages: 🇬🇧 English | 🇮🇳 हिंदी | मराठी | తెలుగు | தமிழ் | ಕನ್ನಡ | বাংলা | ગુજરાતી | ਪੰਜਾਬੀ
+AgriDoc is an in-app agricultural expert powered by GPT-4o-mini. It supports voice input, text-to-speech responses, image upload within the chat, and direct saving of consultations to the Farm Diary.
 
-Features: voice input, text-to-speech replies, photo upload in chat, save to Farm Diary.
+**Supported languages:** English, हिंदी, मराठी, తెలుగు, தமிழ், ಕನ್ನಡ, বাংলা, ગુજરાતી, ਪੰਜਾਬੀ
 
 ---
 
-## 📚 References
+## Future Improvements
+
+- Expand disease coverage beyond 5 classes using a larger annotated dataset
+- Add offline model inference via TensorFlow Lite for low-connectivity environments
+- Integrate government scheme and subsidy data into the consultation system
+- Push notification alerts for seasonal disease outbreaks based on GPS location
+- Admin dashboard for aggregated farm health analytics across users
+
+---
+
+## References
 
 1. Goodfellow et al. (2014) — *Explaining and Harnessing Adversarial Examples* (FGSM)
 2. Madry et al. (2018) — *Towards Deep Learning Models Resistant to Adversarial Attacks* (PGD)
@@ -400,15 +406,14 @@ Features: voice input, text-to-speech replies, photo upload in chat, save to Far
 
 ---
 
-## 👤 Done By
+## Author
 
-**Abdul Samad Shaikh**
-Bachelor of Engineering — Information Technology
-2024–25
+**Abdul Samad Shaikh**  
+Bachelor of Engineering — Information Technology, 2024–25
 
 ---
 
-## 📄 License
+## License
 
 This project is licensed under the [MIT License](LICENSE).
 
@@ -417,7 +422,5 @@ This project is licensed under the [MIT License](LICENSE).
 <div align="center">
 
 Made with 🌿 for Indian farmers
-
-⭐ Star this repo if you found it useful!
 
 </div>
