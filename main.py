@@ -14,6 +14,8 @@ import cv2
 from typing import List, Dict, Any, Optional
 import logging
 from bson import ObjectId
+from auth import auth_router, get_current_user
+from fastapi import Depends
 from consultation import consultation_router
 from diary import diary_router
 from crop_calendar import calendar_router
@@ -27,12 +29,25 @@ import gdown
 import keras.layers as kl
 original_from_config = kl.InputLayer.from_config
 
+#@classmethod
+#def patched_from_config(cls, config):
+    #config.pop('optional', None)
+    #return original_from_config.__func__(cls, config)
 @classmethod
 def patched_from_config(cls, config):
     config.pop('optional', None)
+    config.pop('batch_shape', None)
     return original_from_config.__func__(cls, config)
 
 kl.InputLayer.from_config = patched_from_config
+from keras.layers import Conv2D
+original_conv_from_config = Conv2D.from_config
+@classmethod
+def patched_conv_from_config(cls, config):
+    if isinstance(config.get('dtype'), dict):
+        config['dtype'] = config['dtype'].get('config', {}).get('name', 'float32')
+    return original_conv_from_config.__func__(cls, config)
+Conv2D.from_config = patched_conv_from_config
 # Auto-download model if not present
 MODEL_PATH = os.environ.get("MODEL_PATH", "weights_raw.h5")
 if not os.path.exists(MODEL_PATH):
@@ -68,6 +83,7 @@ app = FastAPI(title="Advanced Plant Disease Detection System")
 app.include_router(consultation_router)
 app.include_router(diary_router)
 app.include_router(calendar_router)
+app.include_router(auth_router)
 
 UPLOAD_DIR = os.environ.get("UPLOAD_DIR", "uploads")
 os.makedirs(UPLOAD_DIR, exist_ok=True)
@@ -83,7 +99,7 @@ collection = db.get_collection("detections")
 
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],
+    allow_origins=["https://your-render-url.onrender.com"],
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
@@ -139,7 +155,7 @@ DISEASE_INFO = {
     }
 }
 #new
-MODEL_PATH = os.environ.get("MODEL_PATH", "weights_raw.h5")
+MODEL_PATH = os.environ.get("MODEL_PATH", "BPLD_CNN_model.h5")
 model = None
 try:
     import h5py
@@ -333,7 +349,7 @@ def preprocess_image(image_path, target_size=(224, 224)):
 
 
 @app.post('/detect')
-async def detect_disease(file: UploadFile = File(...), device_id: str = Form(None)):
+async def detect_disease(file: UploadFile = File(...), device_id: str = Form(None),user=Depends(get_current_user)):
     try:
         if model is None:
             return JSONResponse({'status': 'error', 'detail': 'Model not loaded'}, status_code=500)
@@ -444,6 +460,7 @@ async def detect_disease(file: UploadFile = File(...), device_id: str = Form(Non
         else:
             viz_filename = filename
         record = clean_numpy_types({
+            'user_id': user['user_id'],
             'device_id': str(device),
             'timestamp': int(timestamp),
             'original_image': str(filename),
@@ -466,9 +483,9 @@ async def detect_disease(file: UploadFile = File(...), device_id: str = Form(Non
 
 
 @app.get('/records')
-async def get_detection_records(limit: int = 1000):
+async def get_detection_records(limit: int = 1000,user=Depends(get_current_user)):
     try:
-        docs = list(collection.find().sort('timestamp', -1))
+        docs = list(collection.find({ 'user_id': user['user_id']}).sort('timestamp', -1))
         for doc in docs:
             doc['_id'] = str(doc['_id'])
         return JSONResponse({'status': 'success', 'records': docs})
@@ -477,11 +494,11 @@ async def get_detection_records(limit: int = 1000):
 
 
 @app.delete('/records/{record_id}')
-async def delete_record(record_id: str):
+async def delete_record(record_id: str,user=Depends(get_current_user)):
     try:
         if not ObjectId.is_valid(record_id):
             return JSONResponse({'status': 'error', 'detail': 'Invalid record ID'}, status_code=400)
-        result = collection.delete_one({'_id': ObjectId(record_id)})
+        result = collection.delete_one({'_id': ObjectId(record_id),'user_id': user['user_id']})
         if result.deleted_count == 1:
             return JSONResponse({'status': 'success', 'detail': 'Record deleted successfully'})
         return JSONResponse({'status': 'error', 'detail': 'Record not found'}, status_code=404)
@@ -532,12 +549,12 @@ def get_home_page() -> str:
   color:#fff;position:relative;overflow:hidden;}}
 .home-hero::before{{content:'';position:absolute;inset:0;
   background:url("data:image/svg+xml,%3Csvg width='80' height='80' viewBox='0 0 80 80' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='%23ffffff' fill-opacity='0.04'%3E%3Cpath d='M40 0C17.9 0 0 17.9 0 40s17.9 40 40 40 40-17.9 40-40S62.1 0 40 0zm0 70C23.4 70 10 56.6 10 40S23.4 10 40 10s30 13.4 30 30-13.4 30-30 30z'/%3E%3C/g%3E%3C/svg%3E");}}
-.home-hero-inner{{max-width:760px;margin:0 auto;position:relative;}}
+.home-hero-inner{{max-inline-size:760px;margin:0 auto;position:relative;}}
 .hero-eyebrow{{font-size:.78rem;font-weight:700;letter-spacing:.12em;text-transform:uppercase;
-  opacity:.8;margin-bottom:.75rem;}}
-.home-hero h1{{font-size:2.75rem;font-weight:800;line-height:1.15;margin-bottom:1rem;letter-spacing:-.5px;}}
+  opacity:.8;margin-block-end:.75rem;}}
+.home-hero h1{{font-size:2.75rem;font-weight:800;line-height:1.15;margin-block-end:1rem;letter-spacing:-.5px;}}
 .home-hero h1 em{{font-style:normal;color:var(--ac);}}
-.home-hero .lead{{font-size:1.05rem;opacity:.9;max-width:580px;margin:0 auto 2rem;}}
+.home-hero .lead{{font-size:1.05rem;opacity:.9;max-inline-size:580px;margin:0 auto 2rem;}}
 .hero-cta{{display:flex;gap:.75rem;justify-content:center;flex-wrap:wrap;}}
 .hero-cta .btn{{padding:.85rem 2rem;font-size:.95rem;}}
 .btn-white{{background:#fff;color:var(--p1);}}
@@ -546,56 +563,56 @@ def get_home_page() -> str:
 .btn-outline-white:hover{{background:rgba(255,255,255,.12);border-color:#fff;}}
 
 .stats-strip{{background:var(--p0);padding:1.1rem 1.5rem;}}
-.stats-strip-inner{{max-width:1320px;margin:0 auto;display:grid;
+.stats-strip-inner{{max-inline-size:1320px;margin:0 auto;display:grid;
   grid-template-columns:repeat(5,1fr);gap:1rem;text-align:center;}}
 .strip-num{{font-size:1.6rem;font-weight:800;color:#fff;line-height:1;}}
 .strip-lbl{{font-size:.72rem;color:rgba(255,255,255,.6);font-weight:600;
-  text-transform:uppercase;letter-spacing:.04em;margin-top:.2rem;}}
+  text-transform:uppercase;letter-spacing:.04em;margin-block-start:.2rem;}}
 @media(max-width:700px){{.stats-strip-inner{{grid-template-columns:repeat(3,1fr);}}
   .home-hero h1{{font-size:2rem;}}}}
 
 .features-section{{padding:3.5rem 1.5rem;}}
-.feat-grid{{max-width:1320px;margin:0 auto;display:grid;
+.feat-grid{{max-inline-size:1320px;margin:0 auto;display:grid;
   grid-template-columns:repeat(3,1fr);gap:1.5rem;}}
 @media(max-width:900px){{.feat-grid{{grid-template-columns:1fr 1fr;}}}}
 @media(max-width:600px){{.feat-grid{{grid-template-columns:1fr;}}}}
 .feat-card{{background:var(--card);border-radius:var(--r);border:1px solid var(--bd);
   padding:1.75rem;box-shadow:var(--sh);transition:all .2s;}}
 .feat-card:hover{{transform:translateY(-4px);box-shadow:var(--shm);border-color:var(--p3);}}
-.feat-icon{{width:52px;height:52px;border-radius:14px;background:linear-gradient(135deg,var(--p2),var(--p1));
-  display:flex;align-items:center;justify-content:center;font-size:1.5rem;margin-bottom:1rem;}}
-.feat-title{{font-size:1rem;font-weight:700;color:var(--tx);margin-bottom:.4rem;}}
+.feat-icon{{inline-size:52px;block-size:52px;border-radius:14px;background:linear-gradient(135deg,var(--p2),var(--p1));
+  display:flex;align-items:center;justify-content:center;font-size:1.5rem;margin-block-end:1rem;}}
+.feat-title{{font-size:1rem;font-weight:700;color:var(--tx);margin-block-end:.4rem;}}
 .feat-desc{{font-size:.85rem;color:var(--tx2);line-height:1.6;}}
 
 .how-section{{background:var(--p0);padding:3.5rem 1.5rem;color:#fff;}}
-.how-inner{{max-width:1100px;margin:0 auto;}}
-.how-title{{text-align:center;font-size:1.75rem;font-weight:800;margin-bottom:.5rem;}}
-.how-sub{{text-align:center;opacity:.8;margin-bottom:2.5rem;font-size:.95rem;}}
+.how-inner{{max-inline-size:1100px;margin:0 auto;}}
+.how-title{{text-align:center;font-size:1.75rem;font-weight:800;margin-block-end:.5rem;}}
+.how-sub{{text-align:center;opacity:.8;margin-block-end:2.5rem;font-size:.95rem;}}
 .how-steps{{display:grid;grid-template-columns:repeat(4,1fr);gap:1.5rem;}}
 @media(max-width:800px){{.how-steps{{grid-template-columns:1fr 1fr;}}}}
 @media(max-width:500px){{.how-steps{{grid-template-columns:1fr;}}}}
 .how-step{{text-align:center;padding:1.5rem 1rem;background:rgba(255,255,255,.08);
   border-radius:var(--r);border:1px solid rgba(255,255,255,.12);}}
-.step-num{{width:40px;height:40px;border-radius:50%;background:var(--ac);color:#fff;
+.step-num{{inline-size:40px;block-size:40px;border-radius:50%;background:var(--ac);color:#fff;
   font-weight:800;font-size:1rem;display:flex;align-items:center;justify-content:center;
   margin:0 auto 1rem;}}
-.step-title{{font-size:.9rem;font-weight:700;margin-bottom:.4rem;}}
+.step-title{{font-size:.9rem;font-weight:700;margin-block-end:.4rem;}}
 .step-desc{{font-size:.8rem;opacity:.8;line-height:1.5;}}
 
 .disease-section{{padding:3.5rem 1.5rem;}}
-.disease-inner{{max-width:1100px;margin:0 auto;}}
-.diseases-grid{{display:grid;grid-template-columns:repeat(5,1fr);gap:1rem;margin-top:2rem;}}
+.disease-inner{{max-inline-size:1100px;margin:0 auto;}}
+.diseases-grid{{display:grid;grid-template-columns:repeat(5,1fr);gap:1rem;margin-block-start:2rem;}}
 @media(max-width:900px){{.diseases-grid{{grid-template-columns:1fr 1fr;}}}}
 .disease-card{{border-radius:var(--r);border:2px solid;padding:1.25rem;text-align:center;transition:all .2s;}}
 .disease-card:hover{{transform:translateY(-3px);box-shadow:var(--shm);}}
-.dis-icon{{font-size:2rem;margin-bottom:.6rem;}}
-.dis-name{{font-size:.85rem;font-weight:700;margin-bottom:.3rem;}}
+.dis-icon{{font-size:2rem;margin-block-end:.6rem;}}
+.dis-name{{font-size:.85rem;font-weight:700;margin-block-end:.3rem;}}
 .dis-sev{{font-size:.72rem;font-weight:700;padding:.15rem .5rem;border-radius:20px;}}
 
 .cta-section{{background:linear-gradient(135deg,var(--ac2) 0%,var(--ac) 100%);
   padding:4rem 1.5rem;text-align:center;color:#fff;}}
-.cta-section h2{{font-size:2rem;font-weight:800;margin-bottom:.75rem;}}
-.cta-section p{{font-size:1rem;opacity:.9;margin-bottom:2rem;}}
+.cta-section h2{{font-size:2rem;font-weight:800;margin-block-end:.75rem;}}
+.cta-section p{{font-size:1rem;opacity:.9;margin-block-end:2rem;}}
 </style>
 </head>
 <body>
@@ -696,38 +713,38 @@ def get_home_page() -> str:
   <div class="disease-inner">
     <div class="sec-head" style="justify-content:center;text-align:center;flex-direction:column;">
       <h2 class="sec-title" style="font-size:1.75rem;">Detectable Plant Diseases</h2>
-      <p class="sec-sub" style="margin-top:.4rem;">Our AI recognizes these conditions with high accuracy</p>
+      <p class="sec-sub" style="margin-block-start:.4rem;">Our AI recognizes these conditions with high accuracy</p>
     </div>
     <div class="diseases-grid">
       <div class="disease-card" style="border-color:#E74C3C;background:#FEF2F2;">
         <div class="dis-icon">🍂</div>
         <div class="dis-name" style="color:#C0392B;">Anthracnose</div>
         <span class="dis-sev badge-err">High Severity</span>
-        <p style="font-size:.75rem;color:#7D2A2A;margin-top:.5rem;">Dark fungal lesions on leaves &amp; stems</p>
+        <p style="font-size:.75rem;color:#7D2A2A;margin-block-start:.5rem;">Dark fungal lesions on leaves &amp; stems</p>
       </div>
       <div class="disease-card" style="border-color:#27AE60;background:#F0FFF4;">
         <div class="dis-icon">🌿</div>
         <div class="dis-name" style="color:#1A7A3C;">Healthy</div>
         <span class="dis-sev badge-ok">No Disease</span>
-        <p style="font-size:.75rem;color:#1A5C32;margin-top:.5rem;">Vibrant green foliage, normal growth</p>
+        <p style="font-size:.75rem;color:#1A5C32;margin-block-start:.5rem;">Vibrant green foliage, normal growth</p>
       </div>
       <div class="disease-card" style="border-color:#E67E22;background:#FFF8F0;">
         <div class="dis-icon">🍃</div>
         <div class="dis-name" style="color:#C0510D;">Leaf Crinkle</div>
         <span class="dis-sev badge-warn">Medium</span>
-        <p style="font-size:.75rem;color:#7D3D0D;margin-top:.5rem;">Viral leaf distortion &amp; puckering</p>
+        <p style="font-size:.75rem;color:#7D3D0D;margin-block-start:.5rem;">Viral leaf distortion &amp; puckering</p>
       </div>
       <div class="disease-card" style="border-color:#F39C12;background:#FFFBF0;">
         <div class="dis-icon">🌫️</div>
         <div class="dis-name" style="color:#9A6400;">Powdery Mildew</div>
         <span class="dis-sev badge-warn">Medium</span>
-        <p style="font-size:.75rem;color:#7D5200;margin-top:.5rem;">White powder coating on leaf surfaces</p>
+        <p style="font-size:.75rem;color:#7D5200;margin-block-start:.5rem;">White powder coating on leaf surfaces</p>
       </div>
       <div class="disease-card" style="border-color:#F1C40F;background:#FEFFF0;">
         <div class="dis-icon">🟡</div>
         <div class="dis-name" style="color:#9A8000;">Yellow Mosaic</div>
         <span class="dis-sev badge-err">High Severity</span>
-        <p style="font-size:.75rem;color:#7D6500;margin-top:.5rem;">Viral yellow mottling patterns</p>
+        <p style="font-size:.75rem;color:#7D6500;margin-block-start:.5rem;">Viral yellow mottling patterns</p>
       </div>
     </div>
   </div>
@@ -746,6 +763,7 @@ def get_home_page() -> str:
 <footer style="background:var(--p0);color:rgba(255,255,255,.6);text-align:center;padding:1.5rem;font-size:.82rem;">
   © 2025 PlantDoc AI — Agricultural Disease Detection System &nbsp;|&nbsp; Built with FastAPI + TensorFlow
 </footer>
+{TOAST_SCRIPT}
 </body>
 </html>"""
 
@@ -758,55 +776,55 @@ def get_prediction_page() -> str:
     return f"""<!DOCTYPE html>
 <html lang="en">
 <head>{shared_head("Detect Disease")}<style>
-.predict-layout{{display:grid;grid-template-columns:420px 1fr;gap:1.5rem;margin-top:1.5rem;}}
+.predict-layout{{display:grid;grid-template-columns:420px 1fr;gap:1.5rem;margin-block-start:1.5rem;}}
 @media(max-width:900px){{.predict-layout{{grid-template-columns:1fr;}}}}
 
 /* upload card */
 .upload-zone{{border:2px dashed var(--bd);border-radius:var(--r);padding:2rem;text-align:center;
-  background:var(--bg2);cursor:pointer;transition:all .2s;margin-bottom:1rem;}}
+  background:var(--bg2);cursor:pointer;transition:all .2s;margin-block-end:1rem;}}
 .upload-zone:hover,.upload-zone.drag{{border-color:var(--p2);background:#E8F5EE;}}
 .upload-zone input{{display:none;}}
-.upload-icon{{font-size:2.5rem;margin-bottom:.75rem;}}
+.upload-icon{{font-size:2.5rem;margin-block-end:.75rem;}}
 .upload-text{{font-size:.88rem;color:var(--tx2);font-weight:500;}}
-.upload-hint{{font-size:.75rem;color:var(--tx3);margin-top:.3rem;}}
-.preview-img{{width:100%;border-radius:var(--r);margin-bottom:1rem;object-fit:cover;max-height:280px;
+.upload-hint{{font-size:.75rem;color:var(--tx3);margin-block-start:.3rem;}}
+.preview-img{{inline-size:100%;border-radius:var(--r);margin-block-end:1rem;object-fit:cover;max-block-size:280px;
   border:1px solid var(--bd);box-shadow:var(--sh);display:none;}}
 
 /* result cards */
 .result-placeholder{{text-align:center;padding:4rem 2rem;color:var(--tx3);}}
-.result-placeholder .rp-icon{{font-size:4rem;margin-bottom:1rem;opacity:.4;}}
+.result-placeholder .rp-icon{{font-size:4rem;margin-block-end:1rem;opacity:.4;}}
 
-.disease-result-header{{display:flex;align-items:flex-start;gap:1rem;margin-bottom:1.25rem;}}
-.disease-badge-big{{width:56px;height:56px;border-radius:14px;display:flex;align-items:center;
+.disease-result-header{{display:flex;align-items:flex-start;gap:1rem;margin-block-end:1.25rem;}}
+.disease-badge-big{{inline-size:56px;block-size:56px;border-radius:14px;display:flex;align-items:center;
   justify-content:center;font-size:1.6rem;flex-shrink:0;}}
 .disease-name-big{{font-size:1.35rem;font-weight:800;color:var(--tx);}}
-.disease-desc{{font-size:.85rem;color:var(--tx2);margin-top:.25rem;}}
+.disease-desc{{font-size:.85rem;color:var(--tx2);margin-block-start:.25rem;}}
 
-.conf-row{{display:flex;align-items:center;gap.5rem;margin-bottom:.25rem;}}
-.conf-label{{font-size:.8rem;font-weight:600;color:var(--tx2);min-width:90px;}}
+.conf-row{{display:flex;align-items:center;gap.5rem;margin-block-end:.25rem;}}
+.conf-label{{font-size:.8rem;font-weight:600;color:var(--tx2);min-inline-size:90px;}}
 .conf-value{{font-size:.88rem;font-weight:700;color:var(--p1);}}
 
 .info-pill-row{{display:flex;gap:.5rem;flex-wrap:wrap;margin:1rem 0;}}
 
-.detail-block{{background:var(--bg2);border-radius:10px;padding:1rem 1.1rem;margin-bottom:.75rem;}}
+.detail-block{{background:var(--bg2);border-radius:10px;padding:1rem 1.1rem;margin-block-end:.75rem;}}
 .detail-block-title{{font-size:.78rem;font-weight:700;text-transform:uppercase;letter-spacing:.04em;
-  color:var(--tx3);margin-bottom:.5rem;display:flex;align-items:center;gap:.4rem;}}
+  color:var(--tx3);margin-block-end:.5rem;display:flex;align-items:center;gap:.4rem;}}
 .detail-list{{list-style:none;}}
-.detail-list li{{font-size:.85rem;color:var(--tx2);padding:.2rem 0;border-bottom:1px solid var(--bd2);}}
-.detail-list li:last-child{{border-bottom:none;}}
+.detail-list li{{font-size:.85rem;color:var(--tx2);padding:.2rem 0;border-block-end:1px solid var(--bd2);}}
+.detail-list li:last-child{{border-block-end:none;}}
 .detail-list li::before{{content:"→ ";color:var(--p2);font-weight:700;}}
 
-.adv-grid{{display:grid;grid-template-columns:1fr 1fr 1fr;gap:.5rem;margin-top:.5rem;}}
+.adv-grid{{display:grid;grid-template-columns:1fr 1fr 1fr;gap:.5rem;margin-block-start:.5rem;}}
 .adv-cell{{background:var(--card);border:1px solid var(--bd);border-radius:8px;padding:.6rem;text-align:center;}}
-.adv-cell-name{{font-size:.7rem;font-weight:700;color:var(--tx3);text-transform:uppercase;margin-bottom:.25rem;}}
+.adv-cell-name{{font-size:.7rem;font-weight:700;color:var(--tx3);text-transform:uppercase;margin-block-end:.25rem;}}
 .adv-cell-val{{font-size:.82rem;font-weight:700;color:var(--p1);}}
 
 .smart-box{{background:linear-gradient(135deg,var(--p1),var(--p2));color:#fff;border-radius:var(--r);
-  padding:1rem 1.1rem;margin-bottom:.75rem;}}
+  padding:1rem 1.1rem;margin-block-end:.75rem;}}
 .smart-box .sb-label{{font-size:.75rem;opacity:.8;text-transform:uppercase;letter-spacing:.04em;}}
-.smart-box .sb-value{{font-size:.9rem;font-weight:700;margin-top:.15rem;}}
+.smart-box .sb-value{{font-size:.9rem;font-weight:700;margin-block-start:.15rem;}}
 
-.save-diary-btn{{margin-top:1rem;}}
+.save-diary-btn{{margin-block-start:1rem;}}
 </style>
 </head>
 <body>
@@ -827,7 +845,7 @@ def get_prediction_page() -> str:
 <div class="pda-container">
   <div class="predict-layout">
 
-    <!-- LEFT: Upload Panel -->
+    <!-- inset-inline-start: Upload Panel -->
     <div>
       <div class="pda-card">
         <div class="pda-card-header">📸 Upload Plant Image</div>
@@ -849,31 +867,31 @@ def get_prediction_page() -> str:
             🔍 Analyze Plant Health
           </button>
 
-          <div id="uploadStatus" style="margin-top:.75rem;"></div>
+          <div id="uploadStatus" style="margin-block-start:.75rem;"></div>
         </div>
       </div>
 
       <!-- Tips -->
-      <div class="pda-card" style="margin-top:1rem;">
+      <div class="pda-card" style="margin-block-start:1rem;">
         <div class="pda-card-header">💡 Tips for Best Results</div>
         <div class="pda-card-body" style="font-size:.83rem;color:var(--tx2);">
-          <p style="margin-bottom:.5rem;">✅ Good lighting — avoid dark or blurry shots</p>
-          <p style="margin-bottom:.5rem;">✅ Fill frame with the leaf — close-up is better</p>
-          <p style="margin-bottom:.5rem;">✅ Show affected area clearly</p>
-          <p style="margin-bottom:.5rem;">✅ Avoid photos with shadows or glare</p>
+          <p style="margin-block-end:.5rem;">✅ Good lighting — avoid dark or blurry shots</p>
+          <p style="margin-block-end:.5rem;">✅ Fill frame with the leaf — close-up is better</p>
+          <p style="margin-block-end:.5rem;">✅ Show affected area clearly</p>
+          <p style="margin-block-end:.5rem;">✅ Avoid photos with shadows or glare</p>
           <p>✅ One leaf per photo for best accuracy</p>
         </div>
       </div>
     </div>
 
-    <!-- RIGHT: Results Panel -->
+    <!-- inset-inline-end: Results Panel -->
     <div>
       <div class="pda-card" id="resultsCard">
         <div class="pda-card-header">📊 Analysis Results</div>
         <div class="pda-card-body" id="resultsBody">
           <div class="result-placeholder">
             <div class="rp-icon">🌱</div>
-            <h3 style="font-size:1rem;font-weight:700;color:var(--tx2);margin-bottom:.4rem;">Waiting for Image</h3>
+            <h3 style="font-size:1rem;font-weight:700;color:var(--tx2);margin-block-end:.4rem;">Waiting for Image</h3>
             <p style="font-size:.85rem;">Upload a plant leaf photo to get instant disease detection and treatment recommendations.</p>
           </div>
         </div>
@@ -917,8 +935,8 @@ async function runDetection() {{
   btn.innerHTML = '<span class="spinner"></span> Analyzing...';
   status.innerHTML = '';
   body.innerHTML = `<div style="text-align:center;padding:3rem;color:var(--tx3);">
-    <span class="spinner" style="width:32px;height:32px;border-width:3px;"></span>
-    <p style="margin-top:1rem;font-size:.9rem;font-weight:600;">Processing image with AI + weather correction...</p></div>`;
+    <span class="spinner" style="inline-size:32px;block-size:32px;border-width:3px;"></span>
+    <p style="margin-block-start:1rem;font-size:.9rem;font-weight:600;">Processing image with AI + weather correction...</p></div>`;
 
   const form = new FormData();
   form.append('file', file);
@@ -926,7 +944,7 @@ async function runDetection() {{
   if(deviceId) form.append('device_id', deviceId);
 
   try {{
-    const res = await fetch('/detect', {{ method:'POST', body:form }});
+    const res = await authFetch('/detect', {{ method:'POST', body:form }});
     const data = await res.json();
     if(data.status === 'success') renderResults(data);
     else {{
@@ -964,7 +982,7 @@ function renderResults(data) {{
     <div>
       <div class="disease-name-big">${{p.disease_name}}</div>
       <div class="disease-desc">${{p.description}}</div>
-      <div class="info-pill-row" style="margin-top:.5rem;">
+      <div class="info-pill-row" style="margin-block-start:.5rem;">
         <span class="badge ${{sevClass}}">${{p.severity}} Severity</span>
         <span class="badge badge-green">${{conf}}% Confidence</span>
       </div>
@@ -972,12 +990,12 @@ function renderResults(data) {{
   </div>`;
 
   // Confidence bar
-  html += `<div style="margin-bottom:1rem;">
-    <div style="display:flex;justify-content:space-between;font-size:.8rem;color:var(--tx2);margin-bottom:.25rem;">
+  html += `<div style="margin-block-end:1rem;">
+    <div style="display:flex;justify-content:space-between;font-size:.8rem;color:var(--tx2);margin-block-end:.25rem;">
       <span>Detection Confidence</span><span style="font-weight:700;color:var(--p1);">${{conf}}%</span>
     </div>
-    <div class="pbar-wrap"><div class="pbar-fill" style="width:${{conf}}%"></div></div>
-    <div style="font-size:.75rem;color:var(--tx3);margin-top:.25rem;">${{sa.interpretation || ''}}</div>
+    <div class="pbar-wrap"><div class="pbar-fill" style="inline-size:${{conf}}%"></div></div>
+    <div style="font-size:.75rem;color:var(--tx3);margin-block-start:.25rem;">${{sa.interpretation || ''}}</div>
   </div>`;
 
   // Smart Analysis
@@ -1051,16 +1069,18 @@ html += `
   }}
 
   // Save to diary
-  html += `<button class="btn btn-outline btn-block save-diary-btn" onclick="saveToDiary(${{JSON.stringify(p).replace(/'/g,"\\'")}})">
-    📔 Save to Farm Diary
-  </button>`;
+  window.currentPrediction = p;
+
+html += `<button class="btn btn-outline btn-block save-diary-btn" onclick="saveToDiary(window.currentPrediction)">
+  📔 Save to Farm Diary
+</button>`;
 
   document.getElementById('resultsBody').innerHTML = html;
 }}
 
 async function saveToDiary(pred) {{
   try {{
-    const res = await fetch('/diary/save', {{
+    const res = await authFetch('/diary/save', {{
       method:'POST', headers:{{'Content-Type':'application/json'}},
       body: JSON.stringify({{
         type:'detection', title:`Disease Detected: ${{pred.disease_name}}`,
@@ -1085,29 +1105,29 @@ def get_records_page() -> str:
     return f"""<!DOCTYPE html>
 <html lang="en">
 <head>{shared_head("Detection Records")}<style>
-.filter-bar{{display:flex;gap:.75rem;align-items:center;flex-wrap:wrap;margin-bottom:1.5rem;
+.filter-bar{{display:flex;gap:.75rem;align-items:center;flex-wrap:wrap;margin-block-end:1.5rem;
   background:var(--card);border:1px solid var(--bd);border-radius:var(--r);padding:.9rem 1.1rem;}}
-.filter-bar .form-control{{max-width:200px;}}
+.filter-bar .form-control{{max-inline-size:200px;}}
 
 .records-grid{{display:grid;grid-template-columns:repeat(auto-fill,minmax(320px,1fr));gap:1.25rem;}}
 
 .rec-card{{background:var(--card);border-radius:var(--r);border:1px solid var(--bd);
   overflow:hidden;box-shadow:var(--sh);transition:all .2s;}}
 .rec-card:hover{{transform:translateY(-3px);box-shadow:var(--shm);}}
-.rec-img{{width:100%;height:180px;object-fit:cover;background:var(--bg2);display:block;}}
+.rec-img{{inline-size:100%;block-size:180px;object-fit:cover;background:var(--bg2);display:block;}}
 .rec-body{{padding:1rem 1.1rem;}}
-.rec-header{{display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:.6rem;}}
+.rec-header{{display:flex;align-items:flex-start;justify-content:space-between;margin-block-end:.6rem;}}
 .rec-disease{{font-size:.98rem;font-weight:800;color:var(--tx);}}
 .rec-conf{{font-size:.75rem;font-weight:700;padding:.18rem .55rem;border-radius:20px;
   background:var(--p1);color:#fff;flex-shrink:0;}}
-.rec-meta{{font-size:.75rem;color:var(--tx3);margin-bottom:.65rem;}}
-.rec-treatment{{font-size:.8rem;color:var(--tx2);line-height:1.4;margin-bottom:.75rem;
+.rec-meta{{font-size:.75rem;color:var(--tx3);margin-block-end:.65rem;}}
+.rec-treatment{{font-size:.8rem;color:var(--tx2);line-height:1.4;margin-block-end:.75rem;
   display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;}}
 .rec-footer{{display:flex;align-items:center;justify-content:space-between;
-  padding:.7rem 1.1rem;background:var(--bg2);border-top:1px solid var(--bd2);}}
+  padding:.7rem 1.1rem;background:var(--bg2);border-block-start:1px solid var(--bd2);}}
 .rec-flags{{display:flex;gap:.4rem;flex-wrap:wrap;}}
 
-.stats-row{{display:grid;grid-template-columns:repeat(4,1fr);gap:1rem;margin-bottom:1.5rem;}}
+.stats-row{{display:grid;grid-template-columns:repeat(4,1fr);gap:1rem;margin-block-end:1.5rem;}}
 @media(max-width:700px){{.stats-row{{grid-template-columns:1fr 1fr;}}}}
 </style>
 </head>
@@ -1146,13 +1166,13 @@ def get_records_page() -> str:
       <option value="confidence">By Confidence</option>
     </select>
     <button class="btn btn-ghost btn-sm" onclick="loadRecords()">🔄 Refresh</button>
-    <span id="recCount" class="badge badge-gray" style="margin-left:auto;"></span>
+    <span id="recCount" class="badge badge-gray" style="margin-inline-start:auto;"></span>
   </div>
 
   <!-- Grid -->
   <div id="recordsGrid">
     <div class="empty-state">
-      <div class="es-icon"><span class="spinner" style="width:40px;height:40px;border-width:4px;"></span></div>
+      <div class="es-icon"><span class="spinner" style="inline-size:40px;block-size:40px;border-width:4px;"></span></div>
       <h3>Loading records...</h3>
     </div>
   </div>
@@ -1164,7 +1184,7 @@ let allRecords = [];
 
 async function loadRecords() {{
   try {{
-    const res = await fetch('/records?limit=1000');
+    const res = await authFetch('/records?limit=1000');
     const data = await res.json();
     if(data.status === 'success') {{
       allRecords = data.records;
@@ -1173,7 +1193,7 @@ async function loadRecords() {{
     }}
   }} catch(e) {{
     document.getElementById('recordsGrid').innerHTML =
-      '<div class="alert alert-err" style="margin-top:2rem;">❌ Failed to load records. Please check connection.</div>';
+      '<div class="alert alert-err" style="margin-block-start:2rem;">❌ Failed to load records. Please check connection.</div>';
   }}
 }}
 
@@ -1249,7 +1269,7 @@ function renderRecords(records) {{
 async function deleteRecord(id) {{
   if(!confirm('Delete this record permanently?')) return;
   try {{
-    const res = await fetch(`/records/${{id}}`, {{method:'DELETE'}});
+    const res = await authFetch(`/records/${{id}}`, {{method:'DELETE'}});
     const data = await res.json();
     if(data.status === 'success') {{ showToast('✅ Record deleted'); loadRecords(); }}
     else showToast('⚠️ ' + data.detail);
@@ -1271,30 +1291,30 @@ def get_webcam_page() -> str:
     return f"""<!DOCTYPE html>
 <html lang="en">
 <head>{shared_head("Live Camera")}<style>
-.webcam-layout{{display:grid;grid-template-columns:1fr 1fr;gap:1.5rem;margin-top:1.5rem;}}
+.webcam-layout{{display:grid;grid-template-columns:1fr 1fr;gap:1.5rem;margin-block-start:1.5rem;}}
 @media(max-width:850px){{.webcam-layout{{grid-template-columns:1fr;}}}}
 
 .cam-placeholder{{background:var(--bg2);border:2px dashed var(--bd);border-radius:var(--r);
   padding:3rem;text-align:center;color:var(--tx3);}}
-#video{{width:100%;border-radius:var(--r);display:none;box-shadow:var(--shm);}}
+#video{{inline-size:100%;border-radius:var(--r);display:none;box-shadow:var(--shm);}}
 #canvas{{display:none;}}
 
-.cam-controls{{display:flex;gap:.6rem;flex-wrap:wrap;margin-top:1rem;}}
+.cam-controls{{display:flex;gap:.6rem;flex-wrap:wrap;margin-block-start:1rem;}}
 
 .auto-badge{{display:inline-flex;align-items:center;gap:.4rem;font-size:.78rem;font-weight:600;
   padding:.3rem .7rem;border-radius:20px;background:#E8F5EE;color:var(--p1);border:1px solid var(--p3);}}
 .auto-badge.live{{background:var(--p1);color:#fff;animation:pulse 1.5s ease-in-out infinite;}}
 @keyframes pulse{{0%,100%{{opacity:1}}50%{{opacity:.7}}}}
 
-.live-result-card{{min-height:300px;}}
-.lr-header{{display:flex;align-items:center;justify-content:space-between;margin-bottom:1rem;}}
-.lr-status-dot{{width:10px;height:10px;border-radius:50%;background:#ccc;}}
+.live-result-card{{min-block-size:300px;}}
+.lr-header{{display:flex;align-items:center;justify-content:space-between;margin-block-end:1rem;}}
+.lr-status-dot{{inline-size:10px;block-size:10px;border-radius:50%;background:#ccc;}}
 .lr-status-dot.live{{background:#27AE60;animation:pulse 1.5s infinite;}}
 
 .lrd-name{{font-size:1.25rem;font-weight:800;color:var(--tx);}}
 .lrd-conf{{font-size:.9rem;color:var(--p1);font-weight:600;}}
 .lrd-time{{font-size:.75rem;color:var(--tx3);}}
-.lrd-detail{{background:var(--bg2);border-radius:8px;padding:.85rem 1rem;font-size:.85rem;color:var(--tx2);margin-top:.75rem;}}
+.lrd-detail{{background:var(--bg2);border-radius:8px;padding:.85rem 1rem;font-size:.85rem;color:var(--tx2);margin-block-start:.75rem;}}
 </style>
 </head>
 <body>
@@ -1320,9 +1340,9 @@ def get_webcam_page() -> str:
       <div class="pda-card-header">📷 Camera Feed</div>
       <div class="pda-card-body">
         <div id="camPlaceholder" class="cam-placeholder">
-          <div style="font-size:3rem;margin-bottom:.75rem;">📷</div>
+          <div style="font-size:3rem;margin-block-end:.75rem;">📷</div>
           <p style="font-weight:600;font-size:.9rem;">Camera not started</p>
-          <p style="font-size:.8rem;margin-top:.3rem;">Click Start Camera below to begin live detection</p>
+          <p style="font-size:.8rem;margin-block-start:.3rem;">Click Start Camera below to begin live detection</p>
         </div>
         <video id="video" autoplay muted playsinline></video>
         <canvas id="canvas"></canvas>
@@ -1333,7 +1353,7 @@ def get_webcam_page() -> str:
           <button id="captureBtn" class="btn btn-accent" onclick="captureNow()" style="display:none;">📸 Analyze Now</button>
         </div>
 
-        <div id="autoInfo" style="display:none;margin-top:.75rem;">
+        <div id="autoInfo" style="display:none;margin-block-start:.75rem;">
           <span class="auto-badge live" id="autoStatus">🔄 Auto-detecting every 5 seconds</span>
         </div>
       </div>
@@ -1346,10 +1366,10 @@ def get_webcam_page() -> str:
         <div class="lr-status-dot" id="statusDot"></div>
       </div>
       <div class="pda-card-body" id="liveBody">
-        <div class="cam-placeholder" style="min-height:260px;padding:2rem;border:none;">
-          <div style="font-size:2.5rem;margin-bottom:.75rem;">🌱</div>
+        <div class="cam-placeholder" style="min-block-size:260px;padding:2rem;border:none;">
+          <div style="font-size:2.5rem;margin-block-end:.75rem;">🌱</div>
           <p style="font-weight:600;">Waiting for camera feed</p>
-          <p style="font-size:.8rem;margin-top:.3rem;">Start the camera to see live results here</p>
+          <p style="font-size:.8rem;margin-block-start:.3rem;">Start the camera to see live results here</p>
         </div>
       </div>
     </div>
@@ -1369,7 +1389,7 @@ document.addEventListener('DOMContentLoaded', () => {{
 async function startCamera() {{
   try {{
     stream = await navigator.mediaDevices.getUserMedia({{
-      video: {{width:{{ideal:640}}, height:{{ideal:480}}, facingMode:'environment'}}
+      video: {{inline-size:{{ideal:640}}, block-size:{{ideal:480}}, facingMode:'environment'}}
     }});
     video.srcObject = stream;
     video.style.display = 'block';
@@ -1393,7 +1413,7 @@ function stopCamera() {{
   if(intervalId) clearInterval(intervalId); intervalId = null;
   video.style.display = 'none';
   document.getElementById('camPlaceholder').style.display = 'block';
-  document.getElementById('camPlaceholder').innerHTML = '<div style="font-size:3rem;margin-bottom:.75rem;">⏹</div><p style="font-weight:600;">Camera stopped</p>';
+  document.getElementById('camPlaceholder').innerHTML = '<div style="font-size:3rem;margin-block-end:.75rem;">⏹</div><p style="font-weight:600;">Camera stopped</p>';
   document.getElementById('startBtn').style.display = 'inline-flex';
   document.getElementById('stopBtn').style.display = 'none';
   document.getElementById('captureBtn').style.display = 'none';
@@ -1417,13 +1437,13 @@ async function analyzeBlob(blob, isAuto) {{
   if(isAnalyzing) return;
   isAnalyzing = true;
   const body = document.getElementById('liveBody');
-  if(!isAuto) body.innerHTML = '<div style="text-align:center;padding:2rem;"><span class="spinner" style="width:32px;height:32px;border-width:3px;"></span><p style="margin-top:.75rem;font-size:.85rem;color:var(--tx2);">Analyzing frame...</p></div>';
+  if(!isAuto) body.innerHTML = '<div style="text-align:center;padding:2rem;"><span class="spinner" style="inline-size:32px;block-size:32px;border-width:3px;"></span><p style="margin-block-start:.75rem;font-size:.85rem;color:var(--tx2);">Analyzing frame...</p></div>';
 
   try {{
     const form = new FormData();
     form.append('file', blob, 'webcam.jpg');
     form.append('device_id', 'webcam_' + Date.now());
-    const res = await fetch('/detect', {{method:'POST', body:form}});
+    const res = await authFetch('/detect', {{method:'POST', body:form}});
     const data = await res.json();
     if(data.status === 'success') renderLive(data, isAuto);
     else if(!isAuto) {{
@@ -1451,16 +1471,16 @@ function renderLive(data, isAuto) {{
     <div class="info-pill-row" style="margin:.6rem 0;">
       <span class="badge ${{sevClass}}">${{p.severity}} Severity</span>
     </div>
-    <div class="pbar-wrap"><div class="pbar-fill" style="width:${{conf}}%"></div></div>
+    <div class="pbar-wrap"><div class="pbar-fill" style="inline-size:${{conf}}%"></div></div>
     <div class="lrd-detail">
       <strong>Description:</strong> ${{p.description}}<br>
       <strong>Treatment:</strong> ${{(p.treatment||'').substring(0,120)}}${{p.treatment?.length>120?'...':''}}
     </div>`;
 
   if(wc.foggy_detected||wc.dark_conditions)
-    html += `<div class="alert alert-warn" style="margin-top:.5rem;">🌦️ Weather enhancement applied</div>`;
+    html += `<div class="alert alert-warn" style="margin-block-start:.5rem;">🌦️ Weather enhancement applied</div>`;
   if(aa.attack_detected)
-    html += `<div class="alert alert-err" style="margin-top:.5rem;">🛡️ Defense mechanisms activated</div>`;
+    html += `<div class="alert alert-err" style="margin-block-start:.5rem;">🛡️ Defense mechanisms activated</div>`;
 
   html += `</div>`;
   document.getElementById('liveBody').innerHTML = html;
