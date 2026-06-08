@@ -12,3 +12,6 @@ python-dotenv
 numpy==1.24.3
 gdown
 h5py
+python-jose[cryptography]
+passlib[bcrypt]
+bcrypt
