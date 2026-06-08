@@ -2,7 +2,8 @@
 consultation.py — AI Expert Consultation with Unified PlantDoc AI Design
 """
 
-from fastapi import APIRouter, Request
+from fastapi import APIRouter, Request, Depends
+from auth import get_current_user
 from fastapi.responses import JSONResponse, HTMLResponse
 import os, logging, httpx
 
@@ -48,7 +49,7 @@ async def consultation_page():
 
 
 @consultation_router.post('/ask-expert')
-async def ask_expert(request: Request):
+async def ask_expert(request: Request,user=Depends(get_current_user)):
     try:
         body = await request.json()
         user_message = body.get("message", "").strip()
@@ -397,7 +398,7 @@ async function sendMessage() {{
   appendMessage('bot', '', null, true);
 
   try {{
-    const res = await fetch('/ask-expert', {{
+    const res = await authFetch('/ask-expert', {{
       method: 'POST',
       headers: {{ 'Content-Type': 'application/json' }},
       body: JSON.stringify({{
@@ -551,7 +552,7 @@ async function translateAndSpeak(select, text) {{
   if(!lang) return;
 
   try {{
-    const res = await fetch('/ask-expert', {{
+    const res = await authFetch('/ask-expert', {{
       method: 'POST',
       headers: {{ 'Content-Type': 'application/json' }},
       body: JSON.stringify({{

@@ -250,10 +250,24 @@ def build_nav(active: str = "") -> str:
 <nav class="pda-nav">
   <div class="pda-nav-inner">
     <a href="/" class="pda-logo"><span>🌿</span>PlantDoc AI</a>
+
     <ul class="pda-links">{links_html}</ul>
+
+    <div style="display:flex;align-items:center;gap:.6rem;">
+      <span id="navUserName"
+            style="font-size:.82rem;color:var(--tx2);font-weight:600;">
+      </span>
+
+      <button
+        onclick="logout()"
+        class="btn btn-sm btn-outline"
+        style="padding:.35rem .7rem;">
+        Logout
+      </button>
+    </div>
+
   </div>
 </nav>"""
-
 # ── SHARED HEAD ───────────────────────────────────────────────────────────────
 def shared_head(title: str) -> str:
     return f"""<meta charset="UTF-8">
@@ -264,10 +278,75 @@ def shared_head(title: str) -> str:
 # ── TOAST SCRIPT ─────────────────────────────────────────────────────────────
 TOAST_SCRIPT = """
 <div id="pda-toast"></div>
+
 <script>
+
+function getToken() {
+  return localStorage.getItem('plantdoc_token');
+}
+
+function getUserName() {
+  return localStorage.getItem('plantdoc_name') || 'Farmer';
+}
+
+function logout() {
+  localStorage.removeItem('plantdoc_token');
+  localStorage.removeItem('plantdoc_name');
+  localStorage.removeItem('plantdoc_email');
+  window.location.href = '/login';
+}
+
+function requireAuth() {
+  if (
+      !window.location.pathname.startsWith('/login')
+      &&
+      !window.location.pathname.startsWith('/register')
+  ) {
+      if (!getToken()) {
+          window.location.href = '/login';
+      }
+  }
+}
+
+async function authFetch(url, options = {}) {
+  const token = getToken();
+
+  if (!token) {
+      window.location.href = '/login';
+      return;
+  }
+
+  options.headers = options.headers || {};
+  options.headers['Authorization'] = 'Bearer ' + token;
+
+  const res = await fetch(url, options);
+
+  if (res.status === 401) {
+      logout();
+      return;
+  }
+
+  return res;
+}
+
+function showNavUser() {
+  const el = document.getElementById('navUserName');
+  if (el) {
+      el.textContent = getUserName();
+  }
+}
+
 function showToast(msg, dur=3000){
   const t=document.getElementById('pda-toast');
-  t.textContent=msg;t.classList.add('show');
+  t.textContent=msg;
+  t.classList.add('show');
   setTimeout(()=>t.classList.remove('show'),dur);
 }
-</script>"""
+
+document.addEventListener('DOMContentLoaded', () => {
+  requireAuth();
+  showNavUser();
+});
+
+</script>
+"""

@@ -2,7 +2,8 @@
 diary.py — Farm Diary Module with Unified PlantDoc AI Design
 """
 
-from fastapi import APIRouter, Request
+from fastapi import APIRouter, Request, Depends
+from auth import get_current_user
 from fastapi.responses import JSONResponse, HTMLResponse
 from pymongo import MongoClient
 from bson import ObjectId
@@ -21,10 +22,11 @@ diary_col = _db.get_collection("diary")
 # ── API ENDPOINTS ─────────────────────────────────────────────────────────────
 
 @diary_router.post("/diary/save")
-async def save_diary_entry(request: Request):
+async def save_diary_entry(request: Request,user=Depends(get_current_user)):
     try:
         body = await request.json()
         doc = {
+            "user_id": user["user_id"],
             "type":      body.get("type", "chat"),
             "title":     body.get("title", "Untitled Entry"),
             "content":   body.get("content", {}),
@@ -42,9 +44,9 @@ async def save_diary_entry(request: Request):
 
 
 @diary_router.get("/diary/entries")
-async def get_diary_entries(limit: int = 100, entry_type: str = ""):
+async def get_diary_entries(limit: int = 100, entry_type: str = "",user=Depends(get_current_user)):
     try:
-        query = {}
+        query = {"user_id": user["user_id"]}
         if entry_type in ("chat", "detection"):
             query["type"] = entry_type
         docs = list(diary_col.find(query).sort("timestamp", -1).limit(limit))
@@ -56,11 +58,11 @@ async def get_diary_entries(limit: int = 100, entry_type: str = ""):
 
 
 @diary_router.delete("/diary/entries/{entry_id}")
-async def delete_diary_entry(entry_id: str):
+async def delete_diary_entry(entry_id: str,user=Depends(get_current_user)):
     try:
         if not ObjectId.is_valid(entry_id):
             return JSONResponse({"status": "error", "detail": "Invalid ID"}, status_code=400)
-        result = diary_col.delete_one({"_id": ObjectId(entry_id)})
+        result = diary_col.delete_one({"_id": ObjectId(entry_id),"user_id": user["user_id"]})
         if result.deleted_count:
             return JSONResponse({"status": "success"})
         return JSONResponse({"status": "error", "detail": "Entry not found"}, status_code=404)
@@ -69,13 +71,14 @@ async def delete_diary_entry(entry_id: str):
 
 
 @diary_router.get("/diary/stats")
-async def get_diary_stats():
+async def get_diary_stats(user=Depends(get_current_user)):
     try:
-        total = diary_col.count_documents({})
-        chats = diary_col.count_documents({"type": "chat"})
-        detections = diary_col.count_documents({"type": "detection"})
+        uid = user["user_id"]
+        total = diary_col.count_documents({"user_id": uid})
+        chats = diary_col.count_documents({"user_id": uid,"type": "chat"})
+        detections = diary_col.count_documents({"user_id": uid,"type": "detection"})
         pipeline = [
-            {"$match": {"type": "detection"}},
+            {"$match": {"user_id": uid,"type": "detection"}},
             {"$group": {"_id": "$content.disease_name", "count": {"$sum": 1}}},
             {"$sort": {"count": -1}}, {"$limit": 1}
         ]
@@ -263,7 +266,7 @@ let allEntries = [], currentFilter = 'all', entryMap = {{}};
 async function loadDiary() {{
   try {{
     const [entriesRes, statsRes] = await Promise.all([
-      fetch('/diary/entries?limit=100'), fetch('/diary/stats')
+      authFetch('/diary/entries?limit=100'), authFetch('/diary/stats')
     ]);
     const entries = await entriesRes.json();
     const stats = await statsRes.json();
@@ -410,7 +413,7 @@ document.getElementById('detailModal').addEventListener('click', e => {{
 async function deleteEntry(id) {{
   if(!confirm('Delete this diary entry permanently?')) return;
   try {{
-    const res = await fetch(`/diary/entries/${{id}}`, {{method:'DELETE'}});
+    const res = await authFetch(`/diary/entries/${{id}}`, {{method:'DELETE'}});
     const d = await res.json();
     if(d.status === 'success') {{ showToast('✅ Entry deleted'); loadDiary(); }}
     else showToast('⚠️ ' + d.detail);
