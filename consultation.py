@@ -539,7 +539,7 @@ async function _saveDiary(title, messages) {{
     const context = document.getElementById('diseaseContext').value.trim();
     const tags = ['consultation'];
     if(context) tags.push(...context.split(',').map(s=>s.trim().split(':')[0].trim()).filter(Boolean).slice(0,3));
-    const res = await fetch('/diary/save', {{
+    const res = await authFetch('/diary/save', {{
       method: 'POST', headers: {{'Content-Type': 'application/json'}},
       body: JSON.stringify({{type:'chat', title, language:lang, content:{{messages, context_used:context}}, tags}})
     }});
