@@ -275,20 +275,6 @@ Features: voice input, text-to-speech replies, photo upload in chat, save to Far
 
 ---
 
-## 👥 Team
-
-| Name | Roll No |
-|---|---|
-| Abdul Samad Shaikh | 221435 |
-| Shubham Gupta | 221414 |
-| Shaikh Anas | 221437 |
-| Shaikh Sana | 221451 |
-
-**Guided by:** Prof. Farzana Khan  
-**Department:** Computer Engineering  
-**Year:** 2024–25
-
----
 
 ## 📄 License
 
