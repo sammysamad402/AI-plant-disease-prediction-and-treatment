@@ -12,11 +12,45 @@
 [![Docker](https://img.shields.io/badge/Docker-Containerized-2496ED?style=flat-square&logo=docker&logoColor=white)](https://docker.com)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg?style=flat-square)](LICENSE)
 
-A full-stack agricultural intelligence platform that detects plant diseases from leaf images using a custom-trained CNN, with a 5-layer defense pipeline against adversarial attacks, JWT-based authentication, and a multilingual expert consultation system.
+<br/>
 
-**[🚀 Live Demo →](https://huggingface.co/spaces/sammysamad402/plantdoc-ai)**
+[![Published in IJARSCT](https://img.shields.io/badge/Published-IJARSCT%20%7C%20Vol.6%20Issue%2019%20%7C%20Apr%202026-1a73e8?style=for-the-badge&logo=googlescholar&logoColor=white)](https://ijarsct.co.in/Paper34436.pdf)
+[![DOI](https://img.shields.io/badge/DOI-10.48175%2FIJARSCT--34436-orange?style=for-the-badge)](https://doi.org/10.48175/IJARSCT-34436)
+[![Impact Factor](https://img.shields.io/badge/Impact%20Factor-8.2-brightgreen?style=for-the-badge)](https://ijarsct.co.in/Apr6i19.html)
+
+<br/>
+
+A full-stack agricultural intelligence platform that detects plant diseases from leaf images using a custom-trained CNN, with a 5-layer defense pipeline against adversarial attacks, JWT-based authentication, and a multilingual expert consultation system — **peer-reviewed and published in an international journal.**
+
+<br/>
+
+**[🚀 Live Demo](https://huggingface.co/spaces/sammysamad402/plantdoc-ai)** &nbsp;·&nbsp; **[📄 Read the Paper](https://ijarsct.co.in/Paper34436.pdf)** &nbsp;·&nbsp; **[🌐 Journal Issue](https://ijarsct.co.in/Apr6i19.html)**
 
 </div>
+
+---
+
+## 📰 Research Publication
+
+> This project was formally accepted, peer-reviewed, and published in an international research journal.
+
+<div align="center">
+
+| | |
+|:---|:---|
+| 📌 **Title** | WeatherLeaf: Multi-Modal Plant Disease Risk Prediction by Fusing Leaf Images with Real-Time Meteorological Data for Indian Farms |
+| 📖 **Journal** | International Journal of Advanced Research in Science, Communication and Technology (IJARSCT) |
+| 🔖 **ISSN** | 2581-9429 &nbsp;·&nbsp; Open-Access, Double-Blind, Peer-Reviewed |
+| 📅 **Published** | Volume 6, Issue 19 — April 2026 |
+| 🔗 **DOI** | [10.48175/IJARSCT-34436](https://doi.org/10.48175/IJARSCT-34436) |
+| ⭐ **Impact Factor** | 8.2 (RPRI Indexed) &nbsp;·&nbsp; Crossref Registered |
+| 🏫 **Institution** | M. H. Saboo Siddik College of Engineering, Mumbai, Maharashtra, India |
+
+</div>
+
+<br/>
+
+📄 &nbsp;[**Read Full Paper (PDF)**](https://ijarsct.co.in/Paper34436.pdf) &nbsp;&nbsp;|&nbsp;&nbsp; 🌐 &nbsp;[**View Journal Issue**](https://ijarsct.co.in/Apr6i19.html) &nbsp;&nbsp;|&nbsp;&nbsp; 🔗 &nbsp;[**DOI Link**](https://doi.org/10.48175/IJARSCT-34436)
 
 ---
 
@@ -54,11 +88,11 @@ This project implements a complete defense pipeline alongside a production-grade
 
 | Disease | Severity | Description |
 |---|---|---|
-| Anthracnose | High | Dark fungal lesions on leaves and stems |
-| Healthy | None | Vibrant green foliage, no disease signs |
-| Leaf Crinkle | Medium | Viral leaf distortion and puckering |
-| Powdery Mildew | Medium | White powder coating on leaf surfaces |
-| Yellow Mosaic | High | Viral yellow mottling patterns |
+| Anthracnose | 🔴 High | Dark fungal lesions on leaves and stems |
+| Healthy | ✅ None | Vibrant green foliage, no disease signs |
+| Leaf Crinkle | 🟡 Medium | Viral leaf distortion and puckering |
+| Powdery Mildew | 🟡 Medium | White powder coating on leaf surfaces |
+| Yellow Mosaic | 🔴 High | Viral yellow mottling patterns |
 
 ---
 
@@ -322,33 +356,33 @@ POST  /auth/login      # Login — returns signed JWT token
 ### Detection
 
 ```
-POST  /detect                # Upload image for disease detection
-GET   /records               # Fetch current user's detection history
-DELETE /records/{id}         # Delete a detection record (own records only)
-GET   /image/{filename}      # Serve uploaded image file
+POST   /detect              # Upload image for disease detection
+GET    /records             # Fetch current user's detection history
+DELETE /records/{id}        # Delete a detection record (own records only)
+GET    /image/{filename}    # Serve uploaded image file
 ```
 
 ### Consultation & Diary
 
 ```
-POST  /ask-expert            # Send message to AgriDoc AI
-POST  /diary/save            # Save a diary entry
-GET   /diary/entries         # Fetch current user's diary entries
+POST  /ask-expert       # Send message to AgriDoc AI
+POST  /diary/save       # Save a diary entry
+GET   /diary/entries    # Fetch current user's diary entries
 ```
 
 ### Pages (Auth required except login/register)
 
 ```
-GET   /           → Home
-GET   /predict    → Upload & detect
-GET   /webcam     → Live webcam detection
-GET   /records-page → Detection history
-GET   /consultation → AgriDoc AI chat
-GET   /diary        → Farm diary
-GET   /crop-calendar → Crop calendar
-GET   /agri-shops    → Agricultural store locator
-GET   /login         → Login page (public)
-GET   /register      → Register page (public)
+GET  /              → Home
+GET  /predict       → Upload & detect
+GET  /webcam        → Live webcam detection
+GET  /records-page  → Detection history
+GET  /consultation  → AgriDoc AI chat
+GET  /diary         → Farm diary
+GET  /crop-calendar → Crop calendar
+GET  /agri-shops    → Agricultural store locator
+GET  /login         → Login page (public)
+GET  /register      → Register page (public)
 ```
 
 ---
@@ -369,7 +403,7 @@ GET   /register      → Register page (public)
 ### Defense Effectiveness Summary
 
 ```
-Clean accuracy:              91.4%
+Clean accuracy:                91.4%
 Under FGSM attack (defended):  79.2%   (vs. 28% undefended)
 Under PGD  attack (defended):  71.0%   (vs. 11% undefended)
 Under C&W  attack (defended):  68.3%   (vs. 19% undefended)
@@ -381,7 +415,7 @@ Under C&W  attack (defended):  68.3%   (vs. 19% undefended)
 
 AgriDoc is an in-app agricultural expert powered by GPT-4o-mini. It supports voice input, text-to-speech responses, image upload within the chat, and direct saving of consultations to the Farm Diary.
 
-**Supported languages:** English, हिंदी, मराठी, తెలుగు, தமிழ், ಕನ್ನಡ, বাংলা, ગુજરાતી, ਪੰਜਾਬੀ
+**Supported languages:** English · हिंदी · मराठी · తెలుగు · தமிழ் · ಕನ್ನಡ · বাংলা · ગુજરાતી · ਪੰਜਾਬੀ
 
 ---
 
@@ -408,8 +442,23 @@ AgriDoc is an in-app agricultural expert powered by GPT-4o-mini. It supports voi
 
 ## Author
 
-**Abdul Samad Shaikh**  
-Bachelor of Engineering — Information Technology, 2024–25
+<div align="center">
+
+**Abdul Samad Shaikh**
+
+Bachelor of Engineering — Information Technology
+M. H. Saboo Siddik College of Engineering, Mumbai · 2024–25
+
+<br/>
+
+📰 &nbsp;**Published Researcher** — IJARSCT Vol. 6, Issue 19, April 2026
+
+*WeatherLeaf: Multi-Modal Plant Disease Risk Prediction by Fusing Leaf Images with Real-Time Meteorological Data for Indian Farms*
+
+[![DOI](https://img.shields.io/badge/DOI-10.48175%2FIJARSCT--34436-orange?style=flat-square)](https://doi.org/10.48175/IJARSCT-34436)
+[![Read Paper](https://img.shields.io/badge/Read%20Paper-PDF-red?style=flat-square&logo=adobeacrobatreader&logoColor=white)](https://ijarsct.co.in/Paper34436.pdf)
+
+</div>
 
 ---
 
@@ -422,5 +471,7 @@ This project is licensed under the [MIT License](LICENSE).
 <div align="center">
 
 Made with 🌿 for Indian farmers
+
+⭐ &nbsp;If you found this useful, consider starring the repo
 
 </div>
