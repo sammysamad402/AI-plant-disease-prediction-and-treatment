@@ -1,0 +1,64 @@
+# ── ENVIRONMENT & SECRETS ─────────────────────────────────────────────────────
+.env
+.env.local
+.env.production
+.env.*
+*.h5
+*.pt
+
+# ── ML MODELS (too large for GitHub) ─────────────────────────────────────────
+*.h5
+*.pt
+*.pth
+*.ckpt
+*.pb
+*.tflite
+*.onnx
+saved_model/
+training/
+model_weights.npy
+uploads/
+__pycache__/
+
+# ── UPLOADS & USER DATA ───────────────────────────────────────────────────────
+uploads/
+static/uploads/
+
+# ── PYTHON CACHE ──────────────────────────────────────────────────────────────
+__pycache__/
+*.py[cod]
+*$py.class
+*.pyc
+*.pyo
+.Python
+
+# ── VIRTUAL ENVIRONMENT ───────────────────────────────────────────────────────
+venv/
+env/
+ENV/
+.venv/
+.env/
+
+# ── JUPYTER NOTEBOOKS ─────────────────────────────────────────────────────────
+.ipynb_checkpoints/
+*.ipynb
+
+# ── OS FILES ──────────────────────────────────────────────────────────────────
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# ── IDE & EDITOR ──────────────────────────────────────────────────────────────
+.vscode/
+.idea/
+*.suo
+*.user
+
+# ── LOGS ──────────────────────────────────────────────────────────────────────
+*.log
+logs/
+
+# ── BUILD & DIST ──────────────────────────────────────────────────────────────
+dist/
+build/
+*.egg-info/

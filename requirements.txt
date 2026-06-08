@@ -1,0 +1,17 @@
+fastapi==0.103.2
+uvicorn[standard]
+pymongo
+python-multipart
+opencv-python-headless
+tensorflow-cpu==2.13.0
+keras==2.13.1
+pillow
+requests
+httpx
+python-dotenv
+numpy==1.24.3
+gdown
+h5py
+python-jose[cryptography]
+passlib[bcrypt]==1.7.4
+bcrypt==4.0.1
