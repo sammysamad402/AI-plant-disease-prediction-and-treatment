@@ -1,3 +1,12 @@
+---
+title: PlantDoc AI
+emoji: 🌱
+colorFrom: green
+colorTo: blue
+sdk: docker
+pinned: false
+---
+
 # 🌿 PlantDoc AI — Robust Defense System Against Adversarial Attacks
 
 <div align="center">
