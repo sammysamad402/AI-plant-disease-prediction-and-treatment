@@ -25,9 +25,7 @@ PlantDoc AI is a full-stack agricultural intelligence platform that detects plan
 
 > **Problem:** Existing plant disease AI systems achieve high accuracy in lab settings but are completely undefended against adversarial noise. A perturbation invisible to the human eye can drop model accuracy from 91% to 11%.
 
-> **Our Solution:** A 5-layer defense pipeline implementing FGSM, PGD, and C&W attack simulation with Gaussian blur and median filter defenses — recovering up to 79% accuracy under attack.
-
-Built as a **Major Project** for Computer Engineering, guided by **Prof. Farzana Khan**.
+> **My Solution:** A 5-layer defense pipeline implementing FGSM, PGD, and C&W attack simulation with Gaussian blur and median filter defenses — recovering up to 79% accuracy under attack.
 
 ---
 
