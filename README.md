@@ -1,6 +1,10 @@
 <div align="center">
 
-# 🌿 PlantDoc AI
+<br />
+
+<img src="https://capsule-render.vercel.app/api?type=waving&color=0:00C853,100:2E7D32&height=200&section=header&text=PlantDoc&fontSize=72&fontColor=ffffff&fontAlignY=38&desc=AI-Powered%20Document%20Intelligence%20Platform&descAlignY=58&descSize=20" alt="DocuGenius Banner" width="100%" />
+
+<br />
 
 ### AI-Powered Plant Disease Detection with Adversarial Defense
 
@@ -493,4 +497,8 @@ Made with 🌿 for Indian farmers
 
 ⭐ &nbsp;If you found this useful, consider starring the repo
 
+
+<img src="https://capsule-render.vercel.app/api?type=waving&color=0:00C853,100:2E7D32&height=100&section=footer" width="100%" />
+
 </div>
+
