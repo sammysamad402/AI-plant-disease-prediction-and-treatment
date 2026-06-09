@@ -17,6 +17,9 @@
 [![Published in IJARSCT](https://img.shields.io/badge/Published-IJARSCT%20%7C%20Vol.6%20Issue%2019%20%7C%20Apr%202026-1a73e8?style=for-the-badge&logo=googlescholar&logoColor=white)](https://ijarsct.co.in/Paper34436.pdf)
 [![DOI](https://img.shields.io/badge/DOI-10.48175%2FIJARSCT--34436-orange?style=for-the-badge)](https://doi.org/10.48175/IJARSCT-34436)
 [![Impact Factor](https://img.shields.io/badge/Impact%20Factor-8.2-brightgreen?style=for-the-badge)](https://ijarsct.co.in/Apr6i19.html)
+[![Analytics Dashboard](https://img.shields.io/badge/Analytics%20Dashboard-Live%20Deployment-7B61FF?style=for-the-badge\&logo=plotly\&logoColor=white)](https://sammysamad402-plantdoc-ai-analytics.hf.space)
+[![Behance Showcase](https://img.shields.io/badge/Behance-Featured%20Case%20Study-1769FF?style=for-the-badge\&logo=behance\&logoColor=white)](https://www.behance.net/gallery/250834343/AI-Powered-Plant-Disease-Detection-Analytics-Platform)
+[![Live Demo](https://img.shields.io/badge/Live%20Demo-PlantDoc%20AI-00C853?style=for-the-badge\&logo=huggingface\&logoColor=white)](https://sammysamad402-plantdoc-ai.hf.space)
 
 <br/>
 
