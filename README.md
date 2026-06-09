@@ -473,7 +473,15 @@ https://sammysamad402-plantdoc-ai.hf.space
 https://sammysamad402-plantdoc-ai-analytics.hf.space
 
 ---
+
+### 🎨 Project Showcase:
+https://www.behance.net/gallery/250834343/AI-Powered-Plant-Disease-Detection-Analytics-Platform
+
+---
+
 ## License
+
+---
 
 This project is licensed under the [MIT License](LICENSE).
 
