@@ -24,7 +24,7 @@ A full-stack agricultural intelligence platform that detects plant diseases from
 
 <br/>
 
-**[🚀 Live Demo](https://huggingface.co/spaces/sammysamad402/plantdoc-ai)** &nbsp;·&nbsp; **[📄 Read the Paper](https://ijarsct.co.in/Paper34436.pdf)** &nbsp;·&nbsp; **[🌐 Journal Issue](https://ijarsct.co.in/Apr6i19.html)**
+**[🚀 Live Demo](https://sammysamad402-plantdoc-ai.hf.space)** &nbsp;·&nbsp; **[📄 Read the Paper](https://ijarsct.co.in/Paper34436.pdf)** &nbsp;·&nbsp; **[🌐 Journal Issue](https://ijarsct.co.in/Apr6i19.html)**
 
 </div>
 
@@ -461,7 +461,15 @@ M. H. Saboo Siddik College of Engineering, Mumbai · 2024–25
 </div>
 
 ---
+## 🌐 Live Deployments
 
+### 🌿 PlantDoc AI
+https://sammysamad402-plantdoc-ai.hf.space
+
+### 📊 PlantDoc Analytics Dashboard
+https://sammysamad402-plantdoc-ai-analytics.hf.space
+
+---
 ## License
 
 This project is licensed under the [MIT License](LICENSE).
